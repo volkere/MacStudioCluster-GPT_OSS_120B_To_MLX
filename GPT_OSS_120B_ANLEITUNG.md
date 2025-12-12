@@ -2,9 +2,9 @@
 
 ## Status
 
-✅ **PyTorch installiert** - PyTorch 2.9.1 mit MPS (Metal Performance Shaders) Support für Apple Silicon
-✅ **gpt-oss installiert** - Version 0.0.8
-✅ **Modell heruntergeladen** - GPT-OSS-120B in `gpt-oss-120b/original/`
+**PyTorch installiert** - PyTorch 2.9.1 mit MPS (Metal Performance Shaders) Support für Apple Silicon
+**gpt-oss installiert** - Version 0.0.8
+**Modell heruntergeladen** - GPT-OSS-120B in `gpt-oss-120b/original/`
 
 ## Modell-Informationen
 

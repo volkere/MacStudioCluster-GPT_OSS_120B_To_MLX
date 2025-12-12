@@ -694,13 +694,13 @@ Antwort (JSON-Format):"""
 
 | Aspekt | PyTorch/TensorFlow | MLX | Vorteil MLX |
 |--------|-------------------|-----|-------------|
-| **Performance (Apple Silicon)** | Baseline | 2-4x schneller | ✅ |
-| **Memory Management** | Manuell (CPU/GPU) | Unified Memory | ✅ |
-| **Energieverbrauch** | 100% | 60-70% | ✅ |
-| **Setup-Komplexität** | Mittel | Niedrig | ✅ |
-| **Model Availability** | Sehr groß | Wachsend | ⚠️ |
-| **Cross-Platform** | Ja | Nur Apple Silicon | ⚠️ |
-| **Community** | Sehr groß | Wachsend | ⚠️ |
+| **Performance (Apple Silicon)** | Baseline | 2-4x schneller | Ja |
+| **Memory Management** | Manuell (CPU/GPU) | Unified Memory | Ja |
+| **Energieverbrauch** | 100% | 60-70% | Ja |
+| **Setup-Komplexität** | Mittel | Niedrig | Ja |
+| **Model Availability** | Sehr groß | Wachsend | Teilweise |
+| **Cross-Platform** | Ja | Nur Apple Silicon | Teilweise |
+| **Community** | Sehr groß | Wachsend | Teilweise |
 
 **Empfehlung:**
 - **Für Apple Silicon:** MLX ist klar überlegen

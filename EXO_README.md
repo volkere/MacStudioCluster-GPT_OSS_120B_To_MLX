@@ -88,12 +88,12 @@ curl http://localhost:52415/v1/chat/completions \
 
 ## Features
 
-- ✅ **Automatische Device-Discovery** - Keine manuelle Konfiguration
-- ✅ **MLX Support** - Native Apple Silicon Optimierung
-- ✅ **tinygrad Support** - Cross-Platform Inference
-- ✅ **ChatGPT-kompatible API** - Einfache Integration
-- ✅ **P2P-Architektur** - Keine Master-Worker-Hierarchie
-- ✅ **Heterogene Geräte** - Verschiedene Hardware-Kapazitäten
+- **Automatische Device-Discovery** - Keine manuelle Konfiguration
+- **MLX Support** - Native Apple Silicon Optimierung
+- **tinygrad Support** - Cross-Platform Inference
+- **ChatGPT-kompatible API** - Einfache Integration
+- **P2P-Architektur** - Keine Master-Worker-Hierarchie
+- **Heterogene Geräte** - Verschiedene Hardware-Kapazitäten
 
 ## Model Storage
 

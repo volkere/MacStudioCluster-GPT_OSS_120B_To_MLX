@@ -295,7 +295,7 @@ Dieser Report schätzt die Ressourcen, Zeit und Kosten für ein Face-Tagging-Pro
 
 ### 10.1 Hardware
 
-✅ **Empfohlen:**
+**Empfohlen:**
 - 2-3 Mac Studio M3 Max für Compute
 - 1 Mac Studio M4 Max für Management/GPT
 - 10 TB NAS mit 10GbE
@@ -303,7 +303,7 @@ Dieser Report schätzt die Ressourcen, Zeit und Kosten für ein Face-Tagging-Pro
 
 ### 10.2 Software-Stack
 
-✅ **Empfohlen:**
+**Empfohlen:**
 - RetinaFace für Face Detection (robust bei alten Fotos)
 - ArcFace/InsightFace für Embeddings
 - DBSCAN für Clustering
@@ -313,7 +313,7 @@ Dieser Report schätzt die Ressourcen, Zeit und Kosten für ein Face-Tagging-Pro
 
 ### 10.3 Projektmanagement
 
-✅ **Empfohlen:**
+**Empfohlen:**
 - 3-4 Wochen für Verarbeitung einplanen
 - Puffer von 20% für unerwartete Probleme
 - Regelmäßige Qualitätskontrollen

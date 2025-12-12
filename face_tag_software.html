@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Tag Software - Systemarchitektur</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/white.css">
+    <style>
+        .reveal .slides section {
+            text-align: left;
+        }
+        .reveal h1, .reveal h2, .reveal h3 {
+            text-align: center;
+        }
+        .process-diagram {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 0.8em;
+        }
+        .component-box {
+            border: 2px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .input { border-color: #0066cc; background: #e6f2ff; }
+        .processing { border-color: #00cc66; background: #e6ffe6; }
+        .storage { border-color: #cc6600; background: #fff4e6; }
+        .ai { border-color: #cc0066; background: #ffe6f2; }
+        .frontend { border-color: #6600cc; background: #f2e6ff; }
+        .mlx { border-color: #ff6600; background: #fff0e6; }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <!-- Slide 1: Titel -->
+            <section>
+                <h1>Face Tag Software</h1>
+                <h2>Systemarchitektur</h2>
+                <p style="text-align: center; margin-top: 50px;">
+                    Präsentation der Software-Architektur<br>
+                    für ein Face-Tagging-System<br>
+                    mit KI-gestützter Annotation und Graph-Datenbank
+                </p>
+            </section>
+
+            <!-- Slide 2: Eingangsquelle -->
+            <section>
+                <h2>1. Eingangsquelle</h2>
+                <div class="component-box input">
+                    <h3>Input-Formate</h3>
+                    <ul>
+                        <li><strong>Papierfoto</strong> (Scan, Kameraaufnahme)</li>
+                        <li><strong>Digitales Foto</strong></li>
+                        <li><strong>Serienbilder / Kontaktabzüge</strong></li>
+                        <li><strong>Video-Frames</strong></li>
+                    </ul>
+                    <p><strong>Ziel:</strong> Ein einheitliches Prozessformat, z. B. PNG/JPEG in einem "incoming"-Bucket in minIO.</p>
+                </div>
+            </section>
+
+            <!-- Slide 3: Face Detection -->
+            <section>
+                <h2>2. Face Detection</h2>
+                <p>Erster technischer Schritt nach dem Upload.</p>
+                <div class="component-box processing">
+                    <h3>Empfohlene Modelle</h3>
+                    <ul>
+                        <li><strong>RetinaFace (InsightFace)</strong> – sehr robust bei alten Fotos</li>
+                        <li><strong>DSFD</strong> – hohe Genauigkeit</li>
+                        <li><strong>MTCNN</strong> – etwas älter, aber schnell und zuverlässig</li>
+                    </ul>
+                    <div class="component-box mlx">
+                        <h3>🍎 Apple MLX Integration</h3>
+                        <ul>
+                            <li>Native Apple Silicon Optimierung</li>
+                            <li>2-3x schneller als PyTorch/TensorFlow</li>
+                            <li>Unified Memory Architecture</li>
+                            <li>Automatische GPU/Neural Engine Nutzung</li>
+                        </ul>
+                    </div>
+                    <h3>Output pro Bild</h3>
+                    <pre><code>{
+  "faces": [
+    {
+      "box": [x, y, w, h],
+      "landmarks": {...}
+    }
+  ]
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Slide 4: Embeddings -->
+            <section>
+                <h2>3. Embeddings erzeugen</h2>
+                <p>Für Wiedererkennung / Clustering entscheidend.</p>
+                <div class="component-box processing">
+                    <h3>De-facto Standard</h3>
+                    <ul>
+                        <li><strong>ArcFace / InsightFace</strong> (beste Qualität)</li>
+                        <li><strong>DeepFace-Facenet512</strong> (kompatibel, aber leicht schlechter)</li>
+                    </ul>
+                    <div class="component-box mlx">
+                        <h3>🍎 MLX-optimierte Embeddings</h3>
+                        <ul>
+                            <li>ArcFace-MLX: ~0,1-0,2s pro Gesicht (vs. 0,3s PyTorch)</li>
+                            <li>Batch-Processing optimiert</li>
+                            <li>Optimierte Matrix-Multiplikation</li>
+                        </ul>
+                    </div>
+                    <h3>Output pro Gesicht</h3>
+                    <pre><code>{
+  "embedding": [0.123, 0.543, ...],
+  "confidence": 0.97
+}</code></pre>
+                    <p>Diese Embeddings kommen in einen Vector Store oder werden in Neo4j oder minIO als JSON abgelegt.</p>
+                </div>
+            </section>
+
+            <!-- Slide 5: Clustering -->
+            <section>
+                <h2>4. Face-Clustering (unsupervised)</h2>
+                <p>Optional, aber sehr hilfreich.</p>
+                <div class="component-box processing">
+                    <h3>Verfahren</h3>
+                    <ul>
+                        <li><strong>HDBSCAN</strong></li>
+                        <li><strong>DBSCAN</strong></li>
+                        <li><strong>Agglomerative Clustering</strong></li>
+                    </ul>
+                    <h3>Ziel</h3>
+                    <p>Ungeschilderte Gesichter gruppieren → "Person X taucht in 14 Bildern auf".</p>
+                    <h3>Output</h3>
+                    <pre><code>{
+  "cluster_id": 17,
+  "faces_in_cluster": 23
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Slide 6: GPT-OSS-120B -->
+            <section>
+                <h2>5. GPT-OSS-120B für Annotation & Reasoning</h2>
+                <p>Das ist der Gamechanger. Das Modell übernimmt die dynamische semantische Intelligenz.</p>
+                <div class="component-box ai">
+                    <h3>Was GPT-OSS-120B übernimmt</h3>
+                    <ol>
+                        <li><strong>Semantische Zuordnung der Cluster</strong>
+                            <ul>
+                                <li>Beispiel: "Cluster 12 steht vermutlich für 'John Doe', weil die Metadaten des Albums auf 1975 verweisen."</li>
+                            </ul>
+                        </li>
+                        <li><strong>Validierung von Fehlern</strong>
+                            <ul>
+                                <li>"Diese drei Embeddings liegen weit auseinander → vermutlich fälschlich gemerged."</li>
+                                <li>"Das Foto ist gespiegelt → Landmark-Muster verrät es."</li>
+                            </ul>
+                        </li>
+                        <li><strong>Kontextuelle Annotation</strong>
+                            <ul>
+                                <li>Ort (aus Hintergrund, Metadaten, Textnotizen)</li>
+                                <li>Ereignis (z. B. Tanztheater-Aufführung)</li>
+                                <li>Zeitlogik (Reihenfolgen, Personen altern über die Jahre)</li>
+                            </ul>
+                        </li>
+                        <li><strong>Neo4j-Statements generieren</strong>
+                            <ul>
+                                <li>Nodes und Relations automatisch erstellen</li>
+                            </ul>
+                        </li>
+                        <li><strong>Erstellung einer menschlich anpassbaren Annotations-Datei</strong></li>
+                    </ol>
+                    <div class="component-box mlx">
+                        <h3>🍎 MLX-LM für lokale LLM-Inference</h3>
+                        <ul>
+                            <li><strong>MLX-LM:</strong> Apple's optimiertes LLM-Framework</li>
+                            <li><strong>Unified Memory:</strong> Große Modelle (120B) auf Apple Silicon</li>
+                            <li><strong>Quantisierung:</strong> 4-bit/8-bit für reduzierte Speicheranforderungen</li>
+                            <li><strong>Performance:</strong> 2-4x schneller als PyTorch</li>
+                            <li><strong>Modelle:</strong> Llama 3.1, Mistral, Phi-3, GPT-OSS-120B</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 6b: GPT-OSS-120B Beispiele -->
+            <section>
+                <h2>5. GPT-OSS-120B - Beispiele</h2>
+                <div class="component-box ai">
+                    <h3>Cypher-Output Beispiel</h3>
+                    <pre style="font-size: 0.7em;"><code>MERGE (p:Person {cluster_id: 17})
+SET p.name = "vermutlich: Pina Bausch", 
+    p.confidence = 0.62
+
+MATCH (f:Foto {id: "IMG_00123"})
+MERGE (p)-[:APPEARS_IN {bbox: [x, y, w, h]}]->(f)</code></pre>
+                    <h3>JSON-Annotations-Datei</h3>
+                    <pre style="font-size: 0.7em;"><code>{
+  "file": "IMG_00123",
+  "timestamp": "ca. 1975",
+  "location_hint": "Wuppertal Oper",
+  "persons": [
+    {
+      "cluster": 17,
+      "suggested_label": "Pina Bausch",
+      "confidence": 0.62
+    }
+  ]
+}</code></pre>
+                </div>
+            </section>
+
+            <!-- Slide 7: Speicherung -->
+            <section>
+                <h2>6. Speicherung (minIO + Neo4j)</h2>
+                <div class="component-box storage">
+                    <h3>minIO</h3>
+                    <p><strong>Bucket-Struktur:</strong></p>
+                    <ul>
+                        <li><code>incoming/</code> - Originale Bilder</li>
+                        <li><code>processed/</code> - Verarbeitete Bilder</li>
+                        <li><code>faces/</code> - Crops pro Gesicht</li>
+                        <li><code>annotations/</code> - JSON mit Detektions- und Embedding-Daten</li>
+                    </ul>
+                    <p><strong>Versionskontrolle:</strong> z. B. nach Verbesserung der Modelle</p>
+                </div>
+                <div class="component-box storage">
+                    <h3>Neo4j Graph-Modell</h3>
+                    <p><strong>Nodes:</strong> :Foto, :Person, :Aufnahmeort, :Aufführung, :Cluster, :Jahr</p>
+                    <p><strong>Relations:</strong> APPEARS_IN, TAKEN_AT, PART_OF, LOCATED_IN, SAME_AS, NEXT</p>
+                </div>
+            </section>
+
+            <!-- Slide 7b: Neo4j Cypher Beispiele -->
+            <section>
+                <h2>6. Neo4j - Cypher Beispiele</h2>
+                <div class="component-box storage">
+                    <h3>Constraints & Indizes</h3>
+                    <pre style="font-size: 0.65em;"><code>CREATE CONSTRAINT person_unique IF NOT EXISTS
+FOR (p:Person) REQUIRE p.cluster_id IS UNIQUE;
+
+CREATE CONSTRAINT foto_unique IF NOT EXISTS
+FOR (f:Foto) REQUIRE f.id IS UNIQUE;
+
+CREATE INDEX anno_timestamp IF NOT EXISTS
+FOR (f:Foto) ON (f.timestamp);</code></pre>
+                    <h3>Basismodell einfügen</h3>
+                    <pre style="font-size: 0.65em;"><code>MERGE (f:Foto {id: $foto_id})
+ON CREATE SET f.path = $s3_path, 
+              f.timestamp = $timestamp, 
+              f.source = $source
+
+MERGE (p:Person {cluster_id: $cluster_id})
+ON CREATE SET p.suggested_labels = [$suggested_label], 
+              p.confidence = $confidence
+
+MERGE (p)-[r:APPEARS_IN]->(f)
+SET r.bbox = $bbox, r.confidence = $face_confidence</code></pre>
+                </div>
+            </section>
+
+            <!-- Slide 8: Timeline -->
+            <section>
+                <h2>7. Timeline-Generierung</h2>
+                <p>GPT-OSS-120B ist extrem gut darin, temporale Strukturen aus heterogenen Daten abzuleiten.</p>
+                <div class="component-box ai">
+                    <h3>Vorgehen</h3>
+                    <ol>
+                        <li>Extrahiere EXIF oder archivische Metadaten</li>
+                        <li>GPT erhält: Bildeindrücke, Notizen, Neo4j-Beziehungen</li>
+                        <li>GPT schlägt eine wahrscheinliche Chronologie vor</li>
+                    </ol>
+                    <h3>Output</h3>
+                    <pre><code>[
+  {
+    "date": "1977-02",
+    "event": "Probe für Aufführung X",
+    "photos": ["IMG_00123", "IMG_00124"]
+  }
+]</code></pre>
+                </div>
+            </section>
+
+            <!-- Slide 9: Streamlit -->
+            <section>
+                <h2>8. Streamlit-Frontend</h2>
+                <p>Ziel: Nutzer kann kontrolliert durchsehen, korrigieren und exportieren.</p>
+                <div class="component-box frontend">
+                    <h3>Typische Module</h3>
+                    <ul>
+                        <li><strong>Foto-Viewer</strong></li>
+                        <li><strong>Face-Crop-Galerie</strong></li>
+                        <li><strong>Vorschläge des GPT-Modells</strong></li>
+                        <li><strong>Timeline-Viewer</strong></li>
+                        <li><strong>Neo4j-Graph-View</strong></li>
+                        <li><strong>CSV/JSON Export</strong></li>
+                    </ul>
+                    <h3>Backend-APIs</h3>
+                    <ul>
+                        <li><code>GET /pending</code> - Liste ausstehender Fotos</li>
+                        <li><code>GET /image/{foto_id}</code> - Originalbild</li>
+                        <li><code>GET /face_crop/{foto_id}/{face_id}</code> - Gesichtscrop</li>
+                        <li><code>POST /annotate</code> - Speichert Korrekturen</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 10: Docker-Compose -->
+            <section>
+                <h2>9. Docker-Compose Architektur</h2>
+                <div class="component-box processing">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><strong>Streamlit</strong> - Frontend-Interface (Port 8501)</li>
+                        <li><strong>Backend</strong> (FastAPI/Flask) - API-Layer (Port 8001)</li>
+                        <li><strong>minIO</strong> - Objektspeicher (Ports 9000, 9001)</li>
+                        <li><strong>Neo4j</strong> - Graph-Datenbank (Ports 7474, 7687)</li>
+                        <li><strong>Embedding-Service</strong> (InsightFace/MLX) - Port 5002</li>
+                        <li><strong>Face-Service</strong> (MLX) - Face Detection (Port 5001)</li>
+                        <li><strong>MLX-LLM-Service</strong> - LLM-Inference mit MLX (Port 8000)</li>
+                    </ul>
+                    <div class="component-box mlx">
+                        <h3>🍎 MLX-Services</h3>
+                        <ul>
+                            <li><strong>Face-Service (MLX):</strong> RetinaFace-MLX, native Apple Silicon</li>
+                            <li><strong>Embedding-Service (MLX):</strong> ArcFace-MLX, Batch-optimiert</li>
+                            <li><strong>MLX-LLM-Service:</strong> MLX-LM, quantisierte Modelle</li>
+                        </ul>
+                    </div>
+                    <h3>Features</h3>
+                    <ul>
+                        <li>Healthchecks für alle Services</li>
+                        <li>Volumes für persistente Daten</li>
+                        <li>Service-Dependencies definiert</li>
+                        <li>Umgebungsvariablen für Konfiguration</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 11: Ablaufdiagramm -->
+            <section>
+                <h2>10. Komplettes Ablaufdiagramm</h2>
+                <div class="process-diagram">
+                    <pre>
+Upload → minIO(incoming)
+   ↓
+Face Detection → Crops
+   ↓
+Embeddings → Clustering
+   ↓
+GPT-OSS-120B:
+   - Cluster-Benennung
+   - Event-/Ort-Anreicherung
+   - Logik / Fehlerprüfung
+   - Cypher-Generierung
+   ↓
+Neo4j: Speicherung der Graph-Struktur
+   ↓
+Timeline-Konstruktion via GPT
+   ↓
+Streamlit-UI: Review & Export
+                    </pre>
+                </div>
+            </section>
+
+            <!-- Slide 12: Python Pipeline -->
+            <section>
+                <h2>Python Pipeline - Kernfunktionen</h2>
+                <div class="component-box processing">
+                    <h3>Modulare Komponenten</h3>
+                    <ul>
+                        <li><code>upload_to_minio()</code> - Upload zu Objektspeicher</li>
+                        <li><code>detect_faces()</code> - Face Detection Service</li>
+                        <li><code>get_embedding()</code> - Embedding-Generierung</li>
+                        <li><code>cluster_embeddings()</code> - DBSCAN Clustering</li>
+                        <li><code>ask_gpt_for_annotations()</code> - GPT-OSS Integration</li>
+                        <li><code>generate_cypher_for_cluster()</code> - Cypher-Generierung</li>
+                        <li><code>write_annotation_to_neo4j()</code> - Neo4j Persistierung</li>
+                        <li><code>process_photo()</code> - End-to-End Flow</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 13: MLX Performance -->
+            <section>
+                <h2>Apple MLX - Performance-Benchmarks</h2>
+                <div class="component-box mlx">
+                    <h3>Erwartete Performance-Verbesserungen</h3>
+                    <table style="width: 100%; font-size: 0.9em;">
+                        <tr>
+                            <th>Komponente</th>
+                            <th>PyTorch/TensorFlow</th>
+                            <th>MLX</th>
+                            <th>Verbesserung</th>
+                        </tr>
+                        <tr>
+                            <td>Face Detection</td>
+                            <td>1,5s pro Bild</td>
+                            <td>0,5-0,8s</td>
+                            <td><strong>~2x schneller</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Embedding (pro Gesicht)</td>
+                            <td>0,3s</td>
+                            <td>0,1-0,15s</td>
+                            <td><strong>~2x schneller</strong></td>
+                        </tr>
+                        <tr>
+                            <td>LLM Inference (70B)</td>
+                            <td>15-20 tokens/s</td>
+                            <td>30-40 tokens/s</td>
+                            <td><strong>~2x schneller</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Energieverbrauch</td>
+                            <td>100%</td>
+                            <td>60-70%</td>
+                            <td><strong>~30-40% weniger</strong></td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Slide 14: Technische Highlights -->
+            <section>
+                <h2>Technische Highlights</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="component-box ai">
+                        <h3>KI-Integration</h3>
+                        <ul>
+                            <li><strong>Face Detection:</strong> RetinaFace (MLX), DSFD, MTCNN</li>
+                            <li><strong>Embeddings:</strong> ArcFace/InsightFace (MLX)</li>
+                            <li><strong>Clustering:</strong> HDBSCAN, DBSCAN</li>
+                            <li><strong>Annotation:</strong> GPT-OSS-120B / Llama 3.1 / Mistral (MLX-LM)</li>
+                        </ul>
+                    </div>
+                    <div class="component-box mlx">
+                        <h3>🍎 Apple MLX Framework</h3>
+                        <ul>
+                            <li>Native Apple Silicon Optimierung</li>
+                            <li>Unified Memory Architecture</li>
+                            <li>2-4x Performance-Verbesserung</li>
+                            <li>30-40% Energieeinsparung</li>
+                            <li>Lokale Inference, vollständiger Datenschutz</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="component-box storage" style="margin-top: 20px;">
+                    <h3>Datenbanken & Frontend</h3>
+                    <ul>
+                        <li><strong>minIO:</strong> Objektspeicher für Bilder und Metadaten</li>
+                        <li><strong>Neo4j:</strong> Graph-Datenbank für Beziehungen</li>
+                        <li><strong>Streamlit:</strong> Interaktive UI für Review und Annotation</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 15: MLX Integration Details -->
+            <section>
+                <h2>MLX Integration - Technische Details</h2>
+                <div class="component-box mlx">
+                    <h3>Model Conversion</h3>
+                    <pre style="font-size: 0.7em;"><code># PyTorch zu MLX Konvertierung
+from mlx.utils import convert_weights
+
+retinaface_mlx = convert_weights(retinaface_pytorch)
+arcface_mlx = convert_weights(arcface_pytorch)
+
+# LLM Konvertierung
+from mlx_lm import convert
+convert("meta-llama/Llama-3.1-70B", 
+        mlx_path="./mlx_models/llama-3.1-70b")</code></pre>
+                    <h3>Quantisierung für LLMs</h3>
+                    <ul>
+                        <li><strong>4-bit:</strong> ~75% Speicherreduktion, ~5-10% Qualitätsverlust</li>
+                        <li><strong>8-bit:</strong> ~50% Speicherreduktion, ~1-3% Qualitätsverlust</li>
+                        <li><strong>16-bit (FP16):</strong> ~50% Speicherreduktion, minimaler Qualitätsverlust</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 16: Ende -->
+            <section>
+                <h1>Vielen Dank für Ihre Aufmerksamkeit!</h1>
+                <p style="text-align: center; margin-top: 50px;">
+                    Fragen?
+                </p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide'
+        });
+    </script>
+</body>
+</html>
+

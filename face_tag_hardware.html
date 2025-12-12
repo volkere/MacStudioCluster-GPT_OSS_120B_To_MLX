@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mac Studio Cluster - Netzwerkarchitektur</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/theme/white.css">
+    <style>
+        .reveal .slides section {
+            text-align: left;
+        }
+        .reveal h1, .reveal h2, .reveal h3 {
+            text-align: center;
+        }
+        .network-diagram {
+            font-family: 'Courier New', monospace;
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .vlan-box {
+            border: 2px solid #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .vlan10 { border-color: #0066cc; background: #e6f2ff; }
+        .vlan20 { border-color: #00cc66; background: #e6ffe6; }
+        .vlan30 { border-color: #cc6600; background: #fff4e6; }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <!-- Slide 1: Titel -->
+            <section>
+                <h1>Mac Studio Cluster</h1>
+                <h2>Netzwerkarchitektur</h2>
+                <p style="text-align: center; margin-top: 50px;">
+                    Präsentation der Netzwerkarchitektur<br>
+                    für einen Mac Studio Cluster<br>
+                    mit Storage und Management-Komponenten
+                </p>
+            </section>
+
+            <!-- Slide 2: Übersicht -->
+            <section>
+                <h2>Netzwerk-Topologie</h2>
+                <h3>Zentrale Komponenten</h3>
+                <ul>
+                    <li><strong>Internet / Management</strong> als Ausgangspunkt</li>
+                    <li><strong>Router/VPN/DHCP</strong> für Netzwerkverwaltung</li>
+                    <li><strong>Managed 10/25GbE Switch</strong> als zentrale Verteilungsstelle</li>
+                </ul>
+            </section>
+
+            <!-- Slide 3: VLAN-Struktur -->
+            <section>
+                <h2>VLAN-Struktur</h2>
+                <p>Das Netzwerk ist in drei VLANs unterteilt:</p>
+                <div class="vlan-box vlan10">
+                    <strong>VLAN10</strong> - Cluster
+                </div>
+                <div class="vlan-box vlan20">
+                    <strong>VLAN20</strong> - Storage
+                </div>
+                <div class="vlan-box vlan30">
+                    <strong>VLAN30</strong> - Management
+                </div>
+            </section>
+
+            <!-- Slide 4: VLAN10 -->
+            <section>
+                <h2>VLAN10 - Cluster</h2>
+                <div class="vlan-box vlan10">
+                    <h3>Mac Studio M3 (Compute)</h3>
+                    <ul>
+                        <li><strong>IP-Adresse:</strong> 10.10.10.11</li>
+                        <li><strong>Funktion:</strong> Compute Node</li>
+                        <li><strong>Optional:</strong> Zweite NIC für Management VLAN
+                            <ul>
+                                <li>SSH/Updates über Management VLAN</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 5: VLAN20 -->
+            <section>
+                <h2>VLAN20 - Storage</h2>
+                <div class="vlan-box vlan20">
+                    <h3>NAS (Network Attached Storage)</h3>
+                    <ul>
+                        <li><strong>IP-Adresse:</strong> 10.20.20.100</li>
+                        <li><strong>Anbindung:</strong> 10GbE</li>
+                        <li><strong>Funktion:</strong> Zentraler Speicher für den Cluster</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 6: VLAN30 -->
+            <section>
+                <h2>VLAN30 - Management</h2>
+                <div class="vlan-box vlan30">
+                    <h3>Mac Studio M4 (Compute)</h3>
+                    <ul>
+                        <li><strong>IP-Adresse:</strong> 10.10.10.12</li>
+                        <li><strong>Funktion:</strong> Compute Node</li>
+                        <li><strong>Zweck:</strong> Management und andere Services</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 7: Netzwerkdiagramm -->
+            <section>
+                <h2>Netzwerkarchitektur</h2>
+                <div class="network-diagram">
+                    <pre>
+Internet/Management
+    ↓
+Router/VPN/DHCP
+    ↓
+VLAN30 (Mgmt)
+    ↓
+Managed 10/25GbE Switch
+    ├─→ VLAN10 (Cluster) → Mac Studio M3 (10.10.10.11)
+    ├─→ VLAN20 (Storage) → NAS (10.20.20.100)
+    └─→ VLAN30 (Mgmt) → Mac Studio M4 (10.10.10.12)
+                    </pre>
+                </div>
+            </section>
+
+            <!-- Slide 8: Vorteile -->
+            <section>
+                <h2>Vorteile der VLAN-Trennung</h2>
+                <ul>
+                    <li><strong>Isolierung:</strong> Separate Netzwerke für verschiedene Funktionen</li>
+                    <li><strong>Sicherheit:</strong> Management-Traffic getrennt vom Cluster-Traffic</li>
+                    <li><strong>Performance:</strong> Dedizierte Storage-Verbindung über 10GbE</li>
+                    <li><strong>Skalierbarkeit:</strong> Einfache Erweiterung um weitere Nodes</li>
+                </ul>
+            </section>
+
+            <!-- Slide 9: Technische Details -->
+            <section>
+                <h2>Technische Details</h2>
+                <h3>Netzwerkkomponenten</h3>
+                <ul>
+                    <li><strong>Switch:</strong> Managed 10/25GbE Switch</li>
+                    <li><strong>Storage:</strong> NAS mit 10GbE Anbindung</li>
+                    <li><strong>Compute Nodes:</strong>
+                        <ul>
+                            <li>Mac Studio M3 (Cluster VLAN)</li>
+                            <li>Mac Studio M4 (Management VLAN)</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>IP-Adressierung</h3>
+                <ul>
+                    <li><strong>Cluster:</strong> 10.10.10.x</li>
+                    <li><strong>Storage:</strong> 10.20.20.x</li>
+                    <li><strong>Management:</strong> 10.30.30.x (implizit)</li>
+                </ul>
+            </section>
+
+            <!-- Slide 10: Ende -->
+            <section>
+                <h1>Vielen Dank für Ihre Aufmerksamkeit!</h1>
+                <p style="text-align: center; margin-top: 50px;">
+                    Fragen?
+                </p>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.3.1/dist/reveal.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide'
+        });
+    </script>
+</body>
+</html>
+

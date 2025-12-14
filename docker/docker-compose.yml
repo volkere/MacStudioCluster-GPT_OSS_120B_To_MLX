@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # Management Node (Head)
+  management:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.management
+    container_name: mac-studio-cluster-management
+    hostname: management-node
+    environment:
+      - NODE_TYPE=management
+      - RAY_CPUS=16
+      - RAY_GPUS=1
+      - ENABLE_MONITORING=true
+    ports:
+      - "8000:8000"   # LLM Service
+      - "8080:8080"   # Admin Server
+      - "8265:8265"   # Ray Dashboard
+      - "6380:6380"   # Ray GCS
+      - "9090:9090"   # Prometheus
+      - "3000:3000"   # Grafana
+      - "9091:9091"   # Metrics Collector
+    volumes:
+      - ../:/app
+      - management-data:/app/data
+    networks:
+      - cluster-network
+    restart: unless-stopped
+
+  # Worker Node 1
+  worker1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    container_name: mac-studio-cluster-worker1
+    hostname: worker-node-1
+    environment:
+      - NODE_TYPE=worker
+      - RAY_HEAD_ADDRESS=management:6380
+      - RAY_CPUS=16
+      - RAY_GPUS=1
+    ports:
+      - "5001:5001"   # Face Detection
+      - "5002:5002"   # Embedding
+      - "10001:10001" # Ray Worker
+    volumes:
+      - ../:/app
+      - worker1-data:/app/data
+    networks:
+      - cluster-network
+    depends_on:
+      - management
+    restart: unless-stopped
+
+  # Worker Node 2 (optional)
+  worker2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    container_name: mac-studio-cluster-worker2
+    hostname: worker-node-2
+    environment:
+      - NODE_TYPE=worker
+      - RAY_HEAD_ADDRESS=management:6380
+      - RAY_CPUS=16
+      - RAY_GPUS=1
+    ports:
+      - "5003:5001"   # Face Detection (anderer Port)
+      - "5004:5002"   # Embedding (anderer Port)
+      - "10002:10001" # Ray Worker (anderer Port)
+    volumes:
+      - ../:/app
+      - worker2-data:/app/data
+    networks:
+      - cluster-network
+    depends_on:
+      - management
+    restart: unless-stopped
+    profiles:
+      - multi-worker
+
+volumes:
+  management-data:
+  worker1-data:
+  worker2-data:
+
+networks:
+  cluster-network:
+    driver: bridge

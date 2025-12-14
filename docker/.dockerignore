@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Virtual Environment
+mlx_env/
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+.gitmodules
+
+# Logs
+*.log
+*.pid
+
+# Data
+*.db
+data/
+monitoring/grafana/data/
+monitoring/prometheus/data/
+
+# Exo (wird separat gehandhabt)
+exo/
+
+# Model files
+gpt-oss-120b/
+*.safetensors
+*.bin
+
+# Temporary files
+.tmp/
+tmp/
+*.tmp

@@ -1,0 +1,48 @@
+# Dockerfile für Worker Node
+# Apple Silicon optimiert
+
+FROM python:3.12-slim
+
+# Metadaten
+LABEL maintainer="Mac Studio Cluster"
+LABEL description="Worker Node für Face Tagging System"
+
+# Arbeitsverzeichnis
+WORKDIR /app
+
+# System-Abhängigkeiten
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python-Abhängigkeiten kopieren
+COPY pyproject.toml setup.py ./
+COPY pipeline/ ./pipeline/
+COPY services/ ./services/
+COPY ray_cluster/ ./ray_cluster/
+COPY admin/ ./admin/
+COPY network/ ./network/
+COPY monitoring/ ./monitoring/
+
+# Installiere Python-Abhängigkeiten
+RUN pip install --no-cache-dir -e .
+
+# Installiere MLX (Apple Silicon)
+# Hinweis: MLX läuft nur auf Apple Silicon, daher wird es im Container nicht funktionieren
+# Für Produktion sollte MLX auf dem Host laufen
+RUN pip install --no-cache-dir mlx mlx-lm || echo "MLX wird auf Host installiert"
+
+# Exponiere Ports
+EXPOSE 5001 5002 8080 8265 10001
+
+# Start-Script
+COPY docker/entrypoint-worker.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Environment Variables
+ENV NODE_TYPE=worker
+ENV PYTHONUNBUFFERED=1
+
+ENTRYPOINT ["/entrypoint.sh"]

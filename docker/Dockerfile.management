@@ -1,0 +1,47 @@
+# Dockerfile für Management Node
+# Apple Silicon optimiert
+
+FROM python:3.12-slim
+
+# Metadaten
+LABEL maintainer="Mac Studio Cluster"
+LABEL description="Management Node für Face Tagging System"
+
+# Arbeitsverzeichnis
+WORKDIR /app
+
+# System-Abhängigkeiten
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python-Abhängigkeiten kopieren
+COPY pyproject.toml setup.py ./
+COPY pipeline/ ./pipeline/
+COPY services/ ./services/
+COPY ray_cluster/ ./ray_cluster/
+COPY admin/ ./admin/
+COPY network/ ./network/
+COPY monitoring/ ./monitoring/
+COPY exo/ ./exo/
+
+# Installiere Python-Abhängigkeiten
+RUN pip install --no-cache-dir -e .
+
+# Installiere MLX (Apple Silicon)
+RUN pip install --no-cache-dir mlx mlx-lm || echo "MLX wird auf Host installiert"
+
+# Exponiere Ports
+EXPOSE 8000 8080 8265 6380 9090 3000 9091
+
+# Start-Script
+COPY docker/entrypoint-management.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Environment Variables
+ENV NODE_TYPE=management
+ENV PYTHONUNBUFFERED=1
+
+ENTRYPOINT ["/entrypoint.sh"]

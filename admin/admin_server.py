@@ -23,6 +23,7 @@ RAY_CLUSTER_DIR = PROJECT_ROOT / "ray_cluster"
 NETWORK_DIR = PROJECT_ROOT / "network"
 PIPELINE_DIR = PROJECT_ROOT / "pipeline"
 MLX_ENV = PROJECT_ROOT / "mlx_env"
+NODE_CONFIG_FILE = PROJECT_ROOT / ".node_config.json"
 
 app = Flask(__name__, 
             template_folder='templates',
@@ -338,6 +339,143 @@ def save_config(config_type):
         return jsonify({'success': True})
     except Exception as e:
         logger.error(f"Fehler beim Speichern der Konfiguration: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/node/type', methods=['GET'])
+def get_node_type():
+    """Lädt den konfigurierten Node-Typ"""
+    try:
+        if NODE_CONFIG_FILE.exists():
+            with open(NODE_CONFIG_FILE, 'r') as f:
+                config = json.load(f)
+                return jsonify({'node_type': config.get('node_type', 'management')})
+        return jsonify({'node_type': 'management'})  # Default
+    except Exception as e:
+        logger.error(f"Fehler beim Laden des Node-Typs: {e}")
+        return jsonify({'node_type': 'management'}), 200
+
+
+@app.route('/api/node/type', methods=['POST'])
+def set_node_type():
+    """Setzt den Node-Typ"""
+    try:
+        data = request.json
+        node_type = data.get('node_type')
+        
+        if node_type not in ['management', 'worker', 'storage']:
+            return jsonify({'success': False, 'error': 'Ungültiger Node-Typ'}), 400
+        
+        config = {'node_type': node_type}
+        with open(NODE_CONFIG_FILE, 'w') as f:
+            json.dump(config, f)
+        
+        return jsonify({'success': True, 'node_type': node_type})
+    except Exception as e:
+        logger.error(f"Fehler beim Setzen des Node-Typs: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/services/start-all', methods=['POST'])
+def start_all_services():
+    """Startet alle Services basierend auf Node-Typ"""
+    try:
+        # Lade Node-Typ
+        node_type = 'management'
+        if NODE_CONFIG_FILE.exists():
+            with open(NODE_CONFIG_FILE, 'r') as f:
+                config = json.load(f)
+                node_type = config.get('node_type', 'management')
+        
+        def generate():
+            yield f"=== Starte Services für {node_type} Node ===\n\n"
+            
+            # Services basierend auf Node-Typ
+            services_to_start = []
+            if node_type == 'management':
+                services_to_start = ['llm']  # Management: LLM (exo)
+            elif node_type == 'worker':
+                services_to_start = ['face_detection', 'embedding']  # Worker: Face Detection + Embedding
+            elif node_type == 'storage':
+                services_to_start = []  # Storage: minIO wird separat gestartet
+                yield "Hinweis: minIO sollte manuell gestartet werden\n"
+            
+            # Starte Services über start_services.sh
+            if services_to_start:
+                script_path = SERVICES_DIR / 'start_services.sh'
+                if script_path.exists():
+                    yield f"Starte Services: {', '.join(services_to_start)}\n"
+                    for line in run_command(['bash', str(script_path)], cwd=SERVICES_DIR, shell=False):
+                        yield line
+                else:
+                    yield f"Warnung: start_services.sh nicht gefunden\n"
+            
+            # Ray Cluster starten (nur für Management und Worker)
+            if node_type in ['management', 'worker']:
+                yield "\n=== Starte Ray Cluster ===\n"
+                ray_script = RAY_CLUSTER_DIR / 'start_ray_cluster.sh'
+                if ray_script.exists():
+                    ray_mode = 'head' if node_type == 'management' else 'worker'
+                    yield f"Starte Ray als {ray_mode} node\n"
+                    
+                    if ray_mode == 'worker':
+                        # Lade Head-Adresse aus Config
+                        ray_config_path = RAY_CLUSTER_DIR / 'config.yaml'
+                        head_address = None
+                        if ray_config_path.exists():
+                            try:
+                                with open(ray_config_path, 'r') as f:
+                                    ray_config = yaml.safe_load(f)
+                                    head_node = ray_config.get('head_node', {})
+                                    head_address = f"{head_node.get('ip', 'localhost')}:{head_node.get('gcs_port', 6380)}"
+                            except:
+                                pass
+                        
+                        if head_address:
+                            for line in run_command(['bash', str(ray_script), ray_mode, head_address], cwd=RAY_CLUSTER_DIR, shell=False):
+                                yield line
+                        else:
+                            yield "Warnung: Head-Adresse nicht in Config gefunden. Worker benötigt Head-Adresse.\n"
+                    else:
+                        for line in run_command(['bash', str(ray_script), ray_mode], cwd=RAY_CLUSTER_DIR, shell=False):
+                            yield line
+                else:
+                    yield "Warnung: start_ray_cluster.sh nicht gefunden\n"
+            
+            yield "\n=== Services gestartet ===\n"
+        
+        return Response(stream_with_context(generate()), mimetype='text/plain')
+    except Exception as e:
+        logger.error(f"Fehler beim Starten der Services: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/services/stop-all', methods=['POST'])
+def stop_all_services():
+    """Stoppt alle Services"""
+    try:
+        def generate():
+            yield "=== Stoppe alle Services ===\n\n"
+            
+            # Stoppe Services
+            stop_script = SERVICES_DIR / 'stop_services.sh'
+            if stop_script.exists():
+                yield "Stoppe Python-Services...\n"
+                for line in run_command(['bash', str(stop_script)], cwd=SERVICES_DIR, shell=False):
+                    yield line
+            
+            # Stoppe Ray Cluster
+            ray_stop_script = RAY_CLUSTER_DIR / 'stop_ray_cluster.sh'
+            if ray_stop_script.exists():
+                yield "\nStoppe Ray Cluster...\n"
+                for line in run_command(['bash', str(ray_stop_script)], cwd=RAY_CLUSTER_DIR, shell=False):
+                    yield line
+            
+            yield "\n=== Alle Services gestoppt ===\n"
+        
+        return Response(stream_with_context(generate()), mimetype='text/plain')
+    except Exception as e:
+        logger.error(f"Fehler beim Stoppen der Services: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

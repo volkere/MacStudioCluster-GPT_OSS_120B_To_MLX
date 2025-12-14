@@ -15,11 +15,56 @@
 
         <div class="tabs">
             <button class="tab active" data-tab="overview">Übersicht</button>
+            <button class="tab" data-tab="node-setup">Node Setup</button>
             <button class="tab" data-tab="installation">Installation</button>
             <button class="tab" data-tab="services">Services</button>
             <button class="tab" data-tab="vlan">VLAN Setup</button>
             <button class="tab" data-tab="config">Konfiguration</button>
             <button class="tab" data-tab="status">Status</button>
+        </div>
+
+        <!-- Tab: Node Setup -->
+        <div id="tab-node-setup" class="tab-content">
+            <div class="card">
+                <h2>Node-Typ konfigurieren</h2>
+                <p>Wählen Sie den Typ dieses Nodes. Dies bestimmt, welche Services gestartet werden.</p>
+                
+                <div class="node-type-selection">
+                    <div class="node-type-card" data-node-type="management">
+                        <h3>Management Node</h3>
+                        <p>Verwaltet den Cluster und stellt LLM-Services bereit.</p>
+                        <ul>
+                            <li>Ray Head Node</li>
+                            <li>LLM Service (exo)</li>
+                            <li>Neo4j (optional)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="node-type-card" data-node-type="worker">
+                        <h3>Worker Node</h3>
+                        <p>Führt Compute-Aufgaben aus (Face Detection, Embeddings).</p>
+                        <ul>
+                            <li>Ray Worker Node</li>
+                            <li>Face Detection Service</li>
+                            <li>Embedding Service</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="node-type-card" data-node-type="storage">
+                        <h3>Storage Node</h3>
+                        <p>Stellt Storage-Services bereit.</p>
+                        <ul>
+                            <li>minIO</li>
+                            <li>Storage Services</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <p><strong>Aktueller Node-Typ:</strong> <span id="current-node-type">Lade...</span></p>
+                    <button id="btn-save-node-type" class="btn btn-success" style="display: none;">Node-Typ speichern</button>
+                </div>
+            </div>
         </div>
 
         <!-- Tab: Übersicht -->
@@ -99,8 +144,9 @@
         <div id="tab-services" class="tab-content">
             <div class="card">
                 <h2>Services verwalten</h2>
+                <p id="node-type-info">Node-Typ: <span id="services-node-type">Lade...</span></p>
                 
-                <div class="status-item">
+                <div class="status-item" id="service-face-detection" style="display: none;">
                     <h3>Face Detection Service</h3>
                     <span class="status-indicator offline" id="status-face-detection-indicator"></span>
                     <span id="status-face-detection-text">Offline</span>
@@ -110,7 +156,7 @@
                     </div>
                 </div>
 
-                <div class="status-item" style="margin-top: 15px;">
+                <div class="status-item" id="service-embedding" style="display: none; margin-top: 15px;">
                     <h3>Embedding Service</h3>
                     <span class="status-indicator offline" id="status-embedding-indicator"></span>
                     <span id="status-embedding-text">Offline</span>
@@ -120,7 +166,7 @@
                     </div>
                 </div>
 
-                <div class="status-item" style="margin-top: 15px;">
+                <div class="status-item" id="service-llm" style="display: none; margin-top: 15px;">
                     <h3>LLM Service (exo)</h3>
                     <span class="status-indicator offline" id="status-llm-indicator"></span>
                     <span id="status-llm-text">Offline</span>
@@ -130,9 +176,10 @@
                     </div>
                 </div>
 
-                <div style="margin-top: 20px;">
-                    <button class="btn btn-success" onclick="startAllServices()">Alle starten</button>
-                    <button class="btn btn-danger" onclick="stopAllServices()">Alle stoppen</button>
+                <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px;">
+                    <h3>Service-Steuerung</h3>
+                    <button class="btn btn-success" onclick="startAllServicesForNode()">Alle Services für diesen Node starten</button>
+                    <button class="btn btn-danger" onclick="stopAllServicesForNode()">Alle Services stoppen</button>
                 </div>
             </div>
         </div>
@@ -179,35 +226,53 @@
         <!-- Tab: Konfiguration -->
         <div id="tab-config" class="tab-content">
             <div class="card">
-                <h2>Pipeline Konfiguration</h2>
-                <form id="pipeline-config-form">
-                    <div class="form-group">
-                        <label>Face Detection URL</label>
-                        <input type="text" name="face_detection_url" value="http://10.10.10.11:5001">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Embedding URL</label>
-                        <input type="text" name="embedding_url" value="http://10.10.10.11:5002">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>LLM URL</label>
-                        <input type="text" name="llm_url" value="http://10.30.30.10:8000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>minIO Endpoint</label>
-                        <input type="text" name="minio_endpoint" value="10.20.20.100:9000">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Neo4j URI</label>
-                        <input type="text" name="neo4j_uri" value="bolt://10.30.30.10:7687">
-                    </div>
-                    
-                    <button type="submit" class="btn btn-success">Speichern</button>
-                </form>
+                <h2>Konfiguration verwalten</h2>
+                
+                <div style="margin-bottom: 20px;">
+                    <label>Konfigurationstyp:</label>
+                    <select id="config-type-select" style="padding: 8px; margin-left: 10px;">
+                        <option value="pipeline">Pipeline Config</option>
+                        <option value="ray">Ray Cluster Config</option>
+                        <option value="vlan">VLAN Config</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadConfigFromFile()" style="margin-left: 10px;">Laden</button>
+                    <button class="btn btn-success" onclick="saveConfigToFile()" style="margin-left: 10px;">Speichern</button>
+                </div>
+                
+                <div id="config-editor-container">
+                    <h3>Pipeline Konfiguration</h3>
+                    <form id="pipeline-config-form">
+                        <div class="form-group">
+                            <label>Face Detection URL</label>
+                            <input type="text" name="face_detection_url" value="http://10.10.10.11:5001">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Embedding URL</label>
+                            <input type="text" name="embedding_url" value="http://10.10.10.11:5002">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>LLM URL</label>
+                            <input type="text" name="llm_url" value="http://10.30.30.10:8000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>minIO Endpoint</label>
+                            <input type="text" name="minio_endpoint" value="10.20.20.100:9000">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Neo4j URI</label>
+                            <input type="text" name="neo4j_uri" value="bolt://10.30.30.10:7687">
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="config-yaml-view" style="display: none; margin-top: 20px;">
+                    <h3>YAML Ansicht</h3>
+                    <textarea id="config-yaml-text" style="width: 100%; height: 400px; font-family: monospace;"></textarea>
+                </div>
             </div>
         </div>
 
@@ -241,21 +306,7 @@
             }
         }
 
-        // Pipeline Config Form
-        document.getElementById('pipeline-config-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const config = {
-                services: {
-                    face_detection: { url: formData.get('face_detection_url') },
-                    embedding: { url: formData.get('embedding_url') },
-                    llm: { url: formData.get('llm_url') }
-                },
-                minio: { endpoint: formData.get('minio_endpoint') },
-                neo4j: { uri: formData.get('neo4j_uri') }
-            };
-            await saveConfig('pipeline', config);
-        });
+        // Pipeline Config Form - wird jetzt über saveConfigToFile() gehandhabt
     </script>
 </body>
 </html>

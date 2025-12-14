@@ -27,9 +27,22 @@ log_error() {
 NODE_TYPE=${1:-worker}
 RAY_HEAD=${2:-}
 
+# Korrigiere häufige Tippfehler
+case "$NODE_TYPE" in
+    mangement|mangment|mangement|managment)
+        log_warn "Tippfehler erkannt: '$NODE_TYPE' → 'management'"
+        NODE_TYPE=management
+        ;;
+    workr|worrker|woker)
+        log_warn "Tippfehler erkannt: '$NODE_TYPE' → 'worker'"
+        NODE_TYPE=worker
+        ;;
+esac
+
 if [ "$NODE_TYPE" != "worker" ] && [ "$NODE_TYPE" != "management" ]; then
     log_error "Ungültiger Node-Typ: $NODE_TYPE"
     log_info "Verwendung: $0 <worker|management> [head-address]"
+    log_info "Hinweis: Häufige Tippfehler werden automatisch korrigiert"
     exit 1
 fi
 

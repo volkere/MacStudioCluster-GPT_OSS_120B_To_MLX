@@ -7,11 +7,21 @@ let statusInterval = null;
 
 // Initialisierung
 document.addEventListener('DOMContentLoaded', () => {
-    initTabs();
-    loadStatus();
-    startStatusUpdates();
-    loadNodeType();
-    initNodeTypeSelection();
+    try {
+        initTabs();
+        loadStatus();
+        startStatusUpdates();
+        loadNodeType();
+        initNodeTypeSelection();
+        
+        // Stelle sicher, dass der Overview-Tab sichtbar ist
+        const overviewTab = document.getElementById('tab-overview');
+        if (overviewTab) {
+            overviewTab.classList.add('active');
+        }
+    } catch (error) {
+        console.error('Fehler bei der Initialisierung:', error);
+    }
 });
 
 // Tab-Navigation
@@ -59,9 +69,12 @@ async function loadStatus() {
 
 function updateStatusDisplay(status) {
     // Cluster Status
-    document.getElementById('cluster-nodes').textContent = status.cluster?.nodes || 0;
-    document.getElementById('cluster-cpus').textContent = status.cluster?.cpus || 0;
-    document.getElementById('cluster-gpus').textContent = status.cluster?.gpus || 0;
+    const nodesEl = document.getElementById('cluster-nodes');
+    const cpusEl = document.getElementById('cluster-cpus');
+    const gpusEl = document.getElementById('cluster-gpus');
+    if (nodesEl) nodesEl.textContent = status.cluster?.nodes || 0;
+    if (cpusEl) cpusEl.textContent = status.cluster?.cpus || 0;
+    if (gpusEl) gpusEl.textContent = status.cluster?.gpus || 0;
     
     // Services Status
     updateServiceStatus('face-detection', status.services?.face_detection);
@@ -71,8 +84,10 @@ function updateStatusDisplay(status) {
     updateServiceStatus('neo4j', status.services?.neo4j);
     
     // System Status
-    document.getElementById('system-ram').textContent = formatBytes(status.system?.ram || 0);
-    document.getElementById('system-disk').textContent = formatBytes(status.system?.disk || 0);
+    const ramEl = document.getElementById('system-ram');
+    const diskEl = document.getElementById('system-disk');
+    if (ramEl) ramEl.textContent = formatBytes(status.system?.ram || 0);
+    if (diskEl) diskEl.textContent = formatBytes(status.system?.disk || 0);
 }
 
 function updateServiceStatus(serviceId, status) {
@@ -81,12 +96,27 @@ function updateServiceStatus(serviceId, status) {
         const indicator = element.querySelector('.status-indicator');
         const text = element.querySelector('.status-text');
         
-        if (status?.online) {
-            indicator.className = 'status-indicator online';
-            text.textContent = 'Online';
+        if (indicator && text) {
+            if (status && (status.online === true || status === true)) {
+                indicator.className = 'status-indicator online';
+                if (text) text.textContent = 'Online';
+            } else {
+                indicator.className = 'status-indicator offline';
+                if (text) text.textContent = 'Offline';
+            }
+        }
+    }
+    
+    // Update auch die Service-Status-Indikatoren in anderen Tabs
+    const indicatorEl = document.getElementById(`status-${serviceId}-indicator`);
+    const textEl = document.getElementById(`status-${serviceId}-text`);
+    if (indicatorEl && textEl) {
+        if (status && (status.online === true || status === true)) {
+            indicatorEl.className = 'status-indicator online';
+            textEl.textContent = 'Online';
         } else {
-            indicator.className = 'status-indicator offline';
-            text.textContent = 'Offline';
+            indicatorEl.className = 'status-indicator offline';
+            textEl.textContent = 'Offline';
         }
     }
 }

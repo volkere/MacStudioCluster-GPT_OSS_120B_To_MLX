@@ -63,8 +63,28 @@ start_service() {
     
     # Prüfe ob Port belegt ist
     if check_port $port; then
-        log_warn "Port $port ist bereits belegt, überspringe $service_name"
-        return 1
+        log_warn "Port $port ist bereits belegt"
+        
+        # Versuche Prozess auf Port zu finden und zu beenden
+        local pid=$(lsof -ti :$port 2>/dev/null)
+        if [ -n "$pid" ]; then
+            log_info "Beende Prozess $pid auf Port $port..."
+            kill $pid 2>/dev/null || true
+            sleep 2
+            
+            # Prüfe erneut
+            if check_port $port; then
+                log_warn "Port $port immer noch belegt, erzwinge Beendigung..."
+                kill -9 $pid 2>/dev/null || true
+                sleep 1
+            fi
+        fi
+        
+        # Prüfe nochmal ob Port jetzt frei ist
+        if check_port $port; then
+            log_warn "Port $port ist immer noch belegt, überspringe $service_name"
+            return 1
+        fi
     fi
     
     # Starte Service im Hintergrund

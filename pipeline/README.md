@@ -121,7 +121,7 @@ pipeline.close()
    ↓
 7. Neo4j → Graph-Struktur speichern
    ↓
-8. Fertig ✓
+8. Fertig
 ```
 
 ## Module

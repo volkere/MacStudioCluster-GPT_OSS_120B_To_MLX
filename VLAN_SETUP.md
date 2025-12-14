@@ -2,7 +2,7 @@
 
 Vollständige Anleitung zur Einrichtung von 3 VLANs für Management, Worker und Storage Nodes.
 
-## 📋 Übersicht
+## Übersicht
 
 Das Cluster nutzt 3 separate VLANs für optimale Netzwerk-Isolierung und Performance:
 
@@ -10,7 +10,7 @@ Das Cluster nutzt 3 separate VLANs für optimale Netzwerk-Isolierung und Perform
 - **VLAN 10 - Worker/Cluster** (10.10.10.0/24)
 - **VLAN 20 - Storage** (10.20.20.0/24)
 
-## 🚀 Schnellstart
+## Schnellstart
 
 ### 1. Head Node (Management VLAN)
 
@@ -37,7 +37,7 @@ sudo ./setup_vlan.sh storage 10.30.30.100 10.20.20.100
 ./test_vlan.sh
 ```
 
-## 📐 Netzwerk-Architektur
+## Netzwerk-Architektur
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -70,7 +70,7 @@ sudo ./setup_vlan.sh storage 10.30.30.100 10.20.20.100
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🔧 Detaillierte Einrichtung
+## Detaillierte Einrichtung
 
 ### Voraussetzungen
 
@@ -161,7 +161,7 @@ ifconfig | grep -E "10.30.30.100|10.20.20.100"
 - minIO: 10.20.20.100:9000
 - minIO Console: 10.20.20.100:9001
 
-## 🧪 Testing
+## Testing
 
 ### Connectivity Test
 
@@ -197,7 +197,7 @@ ray status
 ray status  # Sollte Head Node sehen
 ```
 
-## ⚙️ Konfiguration anpassen
+## Konfiguration anpassen
 
 ### IP-Adressen ändern
 
@@ -224,7 +224,7 @@ Anpassen in `setup_vlan.sh` oder manuell:
 networksetup -createVLAN "Worker-VLAN10" en1 10
 ```
 
-## 🔒 Firewall-Konfiguration
+## Firewall-Konfiguration
 
 ### macOS Firewall
 
@@ -250,7 +250,7 @@ sudo /usr/libexec/ApplicationFirewall/socketfilterfw --add /path/to/ray
 - 9000: minIO
 - 9001: minIO Console
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### VLAN wird nicht erstellt
 
@@ -301,14 +301,14 @@ sudo -v
    ./test_vlan.sh
    ```
 
-## 📚 Weitere Informationen
+## Weitere Informationen
 
 - [Network README](network/README.md) - Detaillierte Netzwerk-Dokumentation
 - [Installation Guide](INSTALLATION.md) - Vollständige Installation
 - [Ray Cluster Setup](RAY_CLUSTER_SETUP.md) - Ray Cluster Konfiguration
 - [Haupt-README](README.md) - Projekt-Übersicht
 
-## 🔗 Nützliche Befehle
+## Nützliche Befehle
 
 ```bash
 # VLAN-Status

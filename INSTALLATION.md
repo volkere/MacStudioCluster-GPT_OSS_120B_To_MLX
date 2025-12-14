@@ -2,7 +2,7 @@
 
 Schritt-für-Schritt Anleitung zur Installation des Face Tagging Systems auf mehreren Mac Studio Nodes.
 
-## 📋 Übersicht
+## Übersicht
 
 Diese Anleitung führt dich durch:
 1. Installation auf einem einzelnen Mac
@@ -10,7 +10,7 @@ Diese Anleitung führt dich durch:
 3. Konfiguration aller Services
 4. Verifikation der Installation
 
-## 🖥️ Voraussetzungen
+## Voraussetzungen
 
 ### Hardware
 
@@ -25,7 +25,7 @@ Diese Anleitung führt dich durch:
 - **Git:** Für Repository-Klonen
 - **Homebrew:** Optional, für zusätzliche Tools
 
-## 📦 Installation auf einem Mac
+## Installation auf einem Mac
 
 ### Schritt 1: Repository klonen
 
@@ -101,7 +101,7 @@ ray --version
 python -c "import numpy, pillow, minio, neo4j, ray; print('All dependencies OK')"
 ```
 
-## 🔧 Multi-Mac Cluster Setup
+## Multi-Mac Cluster Setup
 
 ### Übersicht
 
@@ -221,7 +221,7 @@ Du solltest sehen:
 - Verfügbare Ressourcen (CPU, GPU, Memory)
 - Aktive Tasks
 
-## 🔍 Verifikation der Installation
+## Verifikation der Installation
 
 ### Test 1: Lokale Services
 
@@ -263,7 +263,7 @@ pipeline.shutdown()
 EOF
 ```
 
-## 🔄 Services verwalten
+## Services verwalten
 
 ### Services starten
 
@@ -298,7 +298,7 @@ EOF
 ./ray_cluster/start_ray_cluster.sh head  # oder worker
 ```
 
-## 🌐 Netzwerk-Konfiguration
+## Netzwerk-Konfiguration
 
 ### Ports
 
@@ -344,7 +344,7 @@ nc -zv <head-ip> 10001
 ray status  # Auf Head Node
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Problem: Worker kann Head nicht erreichen
 
@@ -391,7 +391,7 @@ source mlx_env/bin/activate
 pip install -e .
 ```
 
-## 📝 Nächste Schritte
+## Nächste Schritte
 
 Nach erfolgreicher Installation:
 
@@ -400,14 +400,14 @@ Nach erfolgreicher Installation:
 3. **Konfiguration anpassen:** `pipeline/config.yaml` und `ray_cluster/config.yaml`
 4. **Modelle hinzufügen:** Siehe [MLX_MODEL_LOADING.md](MLX_MODEL_LOADING.md)
 
-## 💡 Tipps
+## Tipps
 
 - **Automatischer Start:** Erstelle Launch Agents für automatischen Start nach Reboot
 - **Monitoring:** Nutze Ray Dashboard für Cluster-Überwachung
 - **Backup:** Sichere Konfigurationsdateien regelmäßig
 - **Updates:** Halte Dependencies aktuell: `pip install --upgrade -e .`
 
-## 📚 Weitere Ressourcen
+## Weitere Ressourcen
 
 - [Haupt-README](README.md)
 - [Ray Cluster Setup](RAY_CLUSTER_SETUP.md)

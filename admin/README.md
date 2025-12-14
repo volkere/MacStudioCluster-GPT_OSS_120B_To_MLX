@@ -2,7 +2,7 @@
 
 Web-basiertes Admin-Interface für Installation, Konfiguration und Verwaltung des Mac Studio Clusters.
 
-## 🚀 Schnellstart
+## Schnellstart
 
 ```bash
 cd admin
@@ -11,7 +11,7 @@ cd admin
 
 Dann öffne im Browser: http://localhost:8080
 
-## 📋 Features
+## Features
 
 ### Übersicht
 - Cluster-Status (Nodes, CPUs, GPUs)
@@ -44,7 +44,7 @@ Dann öffne im Browser: http://localhost:8080
 - Service-Health-Checks
 - System-Ressourcen
 
-## 🔧 Installation
+## Installation
 
 ### Dependencies
 
@@ -67,7 +67,7 @@ cd admin
 python3 admin_server.py
 ```
 
-## 🌐 API Endpoints
+## API Endpoints
 
 ### Status
 - `GET /api/status` - Cluster- und Service-Status
@@ -87,7 +87,7 @@ python3 admin_server.py
 - `GET /api/config/<type>` - Lädt Konfiguration
 - `POST /api/config/<type>` - Speichert Konfiguration
 
-## 🎨 Interface
+## Interface
 
 Das Dashboard bietet eine moderne, benutzerfreundliche Oberfläche mit:
 
@@ -96,7 +96,7 @@ Das Dashboard bietet eine moderne, benutzerfreundliche Oberfläche mit:
 - **Streaming-Logs** für Installation und Setup
 - **Responsive Design** für verschiedene Bildschirmgrößen
 
-## 🔒 Sicherheit
+## Sicherheit
 
 **Wichtig:** Das Admin-Dashboard läuft standardmäßig auf allen Interfaces (0.0.0.0).
 
@@ -106,7 +106,7 @@ Für Produktion:
 - Implementiere Authentifizierung
 - Beschränke Zugriff auf lokales Netzwerk
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Port bereits belegt
 
@@ -128,7 +128,7 @@ pip install flask flask-cors psutil
 - Prüfe Firewall-Einstellungen
 - Prüfe Service-Konfiguration
 
-## 📚 Weitere Informationen
+## Weitere Informationen
 
 - [Haupt-README](../README.md)
 - [Installation Guide](../INSTALLATION.md)

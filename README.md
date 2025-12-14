@@ -2,7 +2,7 @@
 
 Vollständiges Face Tagging System für Mac Studio Cluster mit MLX-Optimierung, verteilter Verarbeitung über Ray und KI-gestützter Annotation.
 
-## 📋 Inhaltsverzeichnis
+## Inhaltsverzeichnis
 
 - [Übersicht](#übersicht)
 - [Architektur](#architektur)
@@ -13,7 +13,7 @@ Vollständiges Face Tagging System für Mac Studio Cluster mit MLX-Optimierung, 
 - [Performance](#performance)
 - [Troubleshooting](#troubleshooting)
 
-## 🎯 Übersicht
+## Übersicht
 
 Dieses System ermöglicht:
 
@@ -25,7 +25,7 @@ Dieses System ermöglicht:
 - **Verteilte Verarbeitung** über mehrere Mac Studio Nodes mit Ray
 - **GPU-Ressourcen-Sharing** zwischen Nodes
 
-## 🏗️ Architektur
+## Architektur
 
 ### System-Komponenten
 
@@ -79,10 +79,10 @@ LLM-Annotation (GPT-OSS-120B / Llama)
     ↓
 Neo4j Graph-Speicherung
     ↓
-Fertig ✓
+Fertig
 ```
 
-## 🚀 Installation
+## Installation
 
 ### Voraussetzungen
 
@@ -131,7 +131,7 @@ pip install -e .
 cd ..
 ```
 
-## 🌐 VLAN-Konfiguration (Optional)
+## VLAN-Konfiguration (Optional)
 
 Für Multi-Mac Cluster mit Netzwerk-Isolierung:
 
@@ -148,7 +148,7 @@ sudo ./network/setup_vlan.sh storage 10.30.30.100 10.20.20.100
 
 Siehe [VLAN_SETUP.md](VLAN_SETUP.md) für detaillierte Anleitung.
 
-## 🔧 Cluster Setup
+## Cluster Setup
 
 ### Option A: Einzelner Mac (Lokaler Cluster)
 
@@ -245,7 +245,7 @@ ping <head-ip>
 nc -zv <head-ip> 10001
 ```
 
-## 🖥️ Admin Dashboard
+## Admin Dashboard
 
 Web-basiertes Interface für Installation, Konfiguration und Verwaltung:
 
@@ -257,15 +257,15 @@ cd admin
 Dann öffne im Browser: **http://localhost:8080**
 
 **Features:**
-- ✅ Installation aller Dependencies
-- ✅ Service-Management (Start/Stop)
-- ✅ VLAN-Setup
-- ✅ Konfiguration
-- ✅ Cluster-Status und Monitoring
+- Installation aller Dependencies
+- Service-Management (Start/Stop)
+- VLAN-Setup
+- Konfiguration
+- Cluster-Status und Monitoring
 
 Siehe [Admin README](admin/README.md) für Details.
 
-## 📖 Verwendung
+## Verwendung
 
 ### CLI (Command Line)
 
@@ -350,7 +350,7 @@ finally:
     pipeline.shutdown()
 ```
 
-## 🧩 Komponenten
+## Komponenten
 
 ### Services
 
@@ -379,7 +379,7 @@ finally:
 - **`ray_cluster/ray_embeddings.py`** - Ray Remote Functions für Embeddings
 - **`ray_cluster/ray_pipeline.py`** - Ray-basierte Pipeline
 
-## ⚡ Performance
+## Performance
 
 ### Lokale Verarbeitung (1 Node)
 
@@ -404,7 +404,7 @@ finally:
 
 **Linear skalierbar!**
 
-## 🔍 Monitoring
+## Monitoring
 
 ### Ray Dashboard
 
@@ -443,7 +443,7 @@ tail -f pipeline.log
 tail -f ray_pipeline.log
 ```
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### Ray Cluster
 
@@ -523,7 +523,7 @@ Prüfe `pipeline/config.yaml`:
 - Credentials korrekt?
 - Ports verfügbar?
 
-## 📚 Weitere Dokumentation
+## Weitere Dokumentation
 
 - **[Admin Dashboard](admin/README.md)** - Web-Interface für Installation und Verwaltung
 - **[VLAN Setup](VLAN_SETUP.md)** - Multi-VLAN Konfiguration für Management, Worker und Storage
@@ -536,15 +536,15 @@ Prüfe `pipeline/config.yaml`:
 - **[Face Tagging Software](face_tag_software.md)** - Software-Architektur
 - **[Face Tagging Hardware](face_tag_hardware.md)** - Hardware-Architektur
 
-## 🤝 Contributing
+## Contributing
 
 Beiträge sind willkommen! Bitte erstelle ein Issue oder Pull Request.
 
-## 📄 License
+## License
 
 Siehe LICENSE Dateien in den jeweiligen Unterprojekten.
 
-## 🔗 Links
+## Links
 
 - [MLX Framework](https://github.com/ml-explore/mlx)
 - [Ray Framework](https://docs.ray.io/)

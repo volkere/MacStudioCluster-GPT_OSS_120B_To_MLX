@@ -148,21 +148,21 @@ main() {
     log_info "Führe Health Checks durch..."
     
     if wait_for_service "http://localhost:5001/health"; then
-        log_info "✓ Face Detection Service ist bereit"
+        log_info "[OK] Face Detection Service ist bereit"
     else
-        log_warn "✗ Face Detection Service antwortet nicht"
+        log_warn "[FAIL] Face Detection Service antwortet nicht"
     fi
     
     if wait_for_service "http://localhost:5002/health"; then
-        log_info "✓ Embedding Service ist bereit"
+        log_info "[OK] Embedding Service ist bereit"
     else
-        log_warn "✗ Embedding Service antwortet nicht"
+        log_warn "[FAIL] Embedding Service antwortet nicht"
     fi
     
     if wait_for_service "http://localhost:8000/v1/models"; then
-        log_info "✓ LLM Service (exo) ist bereit"
+        log_info "[OK] LLM Service (exo) ist bereit"
     else
-        log_warn "✗ LLM Service antwortet nicht"
+        log_warn "[FAIL] LLM Service antwortet nicht"
     fi
     
     log_info ""

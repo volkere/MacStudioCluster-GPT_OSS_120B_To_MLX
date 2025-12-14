@@ -22,7 +22,7 @@ def process_single_image(args):
         if args.json:
             print(json.dumps(result, indent=2))
         else:
-            print(f"\n✓ Verarbeitung abgeschlossen")
+            print(f"\n[OK] Verarbeitung abgeschlossen")
             print(f"  Photo-ID: {result['photo_id']}")
             print(f"  Gesichter erkannt: {len(result['faces'])}")
             print(f"  Cluster erstellt: {len(result['clusters'])}")
@@ -52,7 +52,7 @@ def process_batch(args):
         if args.json:
             print(json.dumps(results, indent=2))
         else:
-            print(f"\n✓ Batch-Verarbeitung abgeschlossen")
+            print(f"\n[OK] Batch-Verarbeitung abgeschlossen")
             print(f"  Bilder verarbeitet: {len(results)}")
             total_faces = sum(len(r.get('faces', [])) for r in results)
             total_clusters = sum(len(r.get('clusters', [])) for r in results)
@@ -77,7 +77,7 @@ def process_minio_bucket(args):
         if args.json:
             print(json.dumps(results, indent=2))
         else:
-            print(f"\n✓ Bucket-Verarbeitung abgeschlossen")
+            print(f"\n[OK] Bucket-Verarbeitung abgeschlossen")
             print(f"  Bilder verarbeitet: {len(results)}")
             total_faces = sum(len(r.get('faces', [])) for r in results)
             total_clusters = sum(len(r.get('clusters', [])) for r in results)

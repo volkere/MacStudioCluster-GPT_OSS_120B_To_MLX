@@ -31,10 +31,10 @@ test_ping() {
     log_info "Teste Ping zu $description ($target)..."
     
     if ping -c 3 -W 2 "$target" > /dev/null 2>&1; then
-        log_info "✓ $description erreichbar"
+        log_info "[OK] $description erreichbar"
         return 0
     else
-        log_error "✗ $description nicht erreichbar"
+        log_error "[FAIL] $description nicht erreichbar"
         return 1
     fi
 }
@@ -48,10 +48,10 @@ test_port() {
     log_info "Teste Port $port auf $description ($target)..."
     
     if nc -zv -w 2 "$target" "$port" > /dev/null 2>&1; then
-        log_info "✓ Port $port auf $description offen"
+        log_info "[OK] Port $port auf $description offen"
         return 0
     else
-        log_warn "✗ Port $port auf $description nicht erreichbar"
+        log_warn "[FAIL] Port $port auf $description nicht erreichbar"
         return 1
     fi
 }

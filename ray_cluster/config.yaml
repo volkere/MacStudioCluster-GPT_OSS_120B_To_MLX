@@ -3,7 +3,8 @@
 # Head Node (Master) - Management VLAN
 head_node:
   host: "10.30.30.10"  # Management VLAN IP
-  port: 10001
+  gcs_port: 6380  # GCS Server Port
+  client_server_port: 10001  # Ray Client Server Port
   dashboard_port: 8265
   vlan: "management"
   vlan_id: 30
@@ -11,7 +12,7 @@ head_node:
 # Worker Nodes - Worker VLAN
 worker_nodes:
   - host: "10.10.10.11"  # Mac Studio M3 - Worker VLAN
-    port: 10001
+    gcs_port: 6380  # GCS Server Port (vom Head Node)
     management_ip: "10.30.30.11"  # Management VLAN für SSH/Monitoring
     vlan: "worker"
     vlan_id: 10
@@ -20,7 +21,7 @@ worker_nodes:
       GPU: 1  # MLX GPU
       memory: 128000  # MB
   - host: "10.10.10.12"  # Mac Studio M4 - Worker VLAN
-    port: 10001
+    gcs_port: 6380  # GCS Server Port (vom Head Node)
     management_ip: "10.30.30.12"  # Management VLAN für SSH/Monitoring
     vlan: "worker"
     vlan_id: 10
@@ -43,8 +44,10 @@ storage_node:
 ray:
   num_cpus: 16
   num_gpus: 1  # MLX GPU pro Node
-  object_store_memory: 32000000000  # 32 GB
+  # object_store_memory wird automatisch von Ray gewählt
   dashboard_host: "0.0.0.0"
+  gcs_port: 6380  # GCS Server Port
+  client_server_port: 10001  # Ray Client Server Port
   runtime_env:
     pip:
       - mlx>=0.29.0

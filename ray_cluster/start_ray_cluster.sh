@@ -47,13 +47,15 @@ start_head() {
     cd "$PROJECT_ROOT"
     
     # Ray Head starten
+    # Port-Konfiguration: GCS auf 6380 (um Konflikte zu vermeiden), Client Server auf 10001, Dashboard auf 8265
+    # object_store_memory wird automatisch von Ray gewählt
     ray start --head \
-        --port=10001 \
+        --port=6380 \
+        --ray-client-server-port=10001 \
         --dashboard-host=0.0.0.0 \
         --dashboard-port=8265 \
         --num-cpus=16 \
         --num-gpus=1 \
-        --object-store-memory=32000000000 \
         --disable-usage-stats
     
     log_info "Ray Head Node gestartet"
@@ -76,10 +78,10 @@ start_worker() {
     cd "$PROJECT_ROOT"
     
     # Ray Worker starten
+    # Worker verwendet automatisch verfügbare Ports
     ray start --address="$head_address" \
         --num-cpus=16 \
         --num-gpus=1 \
-        --object-store-memory=32000000000 \
         --disable-usage-stats
     
     log_info "Ray Worker Node gestartet"

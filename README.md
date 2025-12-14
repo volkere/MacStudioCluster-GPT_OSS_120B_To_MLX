@@ -8,6 +8,7 @@ Vollständiges Face Tagging System für Mac Studio Cluster mit MLX-Optimierung, 
 - [Architektur](#architektur)
 - [Installation](#installation)
 - [Cluster Setup](#cluster-setup)
+- [Monitoring](#monitoring)
 - [Verwendung](#verwendung)
 - [Komponenten](#komponenten)
 - [Performance](#performance)
@@ -264,6 +265,48 @@ Dann öffne im Browser: **http://localhost:8080**
 - Cluster-Status und Monitoring
 
 Siehe [Admin README](admin/README.md) für Details.
+
+## Monitoring
+
+Das System bietet umfassendes Monitoring mit Grafana und Prometheus:
+
+### Installation
+
+```bash
+./monitoring/install_monitoring.sh
+```
+
+### Services starten
+
+```bash
+# 1. Prometheus starten
+./monitoring/start_prometheus.sh
+
+# 2. Metrics Collector starten
+./monitoring/start_metrics_collector.sh
+
+# 3. Grafana starten
+./monitoring/start_grafana.sh
+```
+
+### Zugriff
+
+- **Grafana Dashboard:** http://localhost:3000 (Login: `admin` / `admin`)
+- **Prometheus:** http://localhost:9090
+- **Metrics Endpoint:** http://localhost:9091/metrics
+
+### Verfügbare Metriken
+
+- **System:** CPU, Memory, Disk Usage
+- **Ray Cluster:** Nodes, CPUs, GPUs, Memory
+- **Services:** Status und Response-Zeiten (Face Detection, Embedding, LLM, Admin)
+
+### Über Admin-Seite
+
+Die Admin-Seite bietet einen Monitoring-Tab zum Starten/Stoppen der Services:
+- http://localhost:8080 → Tab "Monitoring"
+
+Weitere Details: [monitoring/README.md](monitoring/README.md)
 
 ## Verwendung
 

@@ -1,25 +1,43 @@
 # Ray Cluster Configuration für Mac Studio Cluster
 
-# Head Node (Master)
+# Head Node (Master) - Management VLAN
 head_node:
-  host: "localhost"  # IP des Head Nodes
+  host: "10.30.30.10"  # Management VLAN IP
   port: 10001
   dashboard_port: 8265
+  vlan: "management"
+  vlan_id: 30
 
-# Worker Nodes
+# Worker Nodes - Worker VLAN
 worker_nodes:
-  - host: "10.10.10.11"  # Mac Studio M3
+  - host: "10.10.10.11"  # Mac Studio M3 - Worker VLAN
     port: 10001
+    management_ip: "10.30.30.11"  # Management VLAN für SSH/Monitoring
+    vlan: "worker"
+    vlan_id: 10
     resources:
       CPU: 16
       GPU: 1  # MLX GPU
       memory: 128000  # MB
-  - host: "10.10.10.12"  # Mac Studio M4
+  - host: "10.10.10.12"  # Mac Studio M4 - Worker VLAN
     port: 10001
+    management_ip: "10.30.30.12"  # Management VLAN für SSH/Monitoring
+    vlan: "worker"
+    vlan_id: 10
     resources:
       CPU: 16
       GPU: 1  # MLX GPU
       memory: 128000  # MB
+
+# Storage Node - Storage VLAN
+storage_node:
+  host: "10.20.20.100"  # Storage VLAN IP
+  management_ip: "10.30.30.100"  # Management VLAN für SSH/Monitoring
+  vlan: "storage"
+  vlan_id: 20
+  services:
+    minio: 9000
+    minio_console: 9001
 
 # Ray Configuration
 ray:
@@ -52,3 +70,28 @@ network:
   redis_password: null  # Optional: Redis Password für Sicherheit
   node_ip_address: "0.0.0.0"
   allow_ports: [10001, 8265, 10002]  # Ray Ports
+  
+# VLAN Configuration
+vlans:
+  management:
+    subnet: "10.30.30.0/24"
+    gateway: "10.30.30.1"
+    services:
+      - ray_dashboard: 8265
+      - ssh: 22
+      - monitoring: 9090
+      
+  worker:
+    subnet: "10.10.10.0/24"
+    gateway: "10.10.10.1"
+    services:
+      - ray_worker: 10001
+      - face_detection: 5001
+      - embedding: 5002
+      
+  storage:
+    subnet: "10.20.20.0/24"
+    gateway: "10.20.20.1"
+    services:
+      - minio: 9000
+      - minio_console: 9001

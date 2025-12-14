@@ -1,0 +1,126 @@
+# VLAN-Konfiguration für Mac Studio Cluster
+
+# VLAN-Definitionen
+vlans:
+  management:
+    id: 30
+    name: "Management"
+    subnet: "10.30.30.0/24"
+    gateway: "10.30.30.1"
+    dns: ["10.30.30.1", "8.8.8.8"]
+    description: "Management-Netzwerk für SSH, Updates, Monitoring"
+    nodes:
+      - name: "head-node"
+        ip: "10.30.30.10"
+        role: "head"
+        services:
+          - "ray-head"
+          - "ray-dashboard"
+          - "monitoring"
+          - "ssh"
+    
+  worker:
+    id: 10
+    name: "Worker/Cluster"
+    subnet: "10.10.10.0/24"
+    gateway: "10.10.10.1"
+    dns: ["10.10.10.1", "8.8.8.8"]
+    description: "Cluster-Netzwerk für Ray Worker Nodes und Compute"
+    nodes:
+      - name: "worker-node-1"
+        ip: "10.10.10.11"
+        role: "worker"
+        services:
+          - "ray-worker"
+          - "face-detection"
+          - "embedding"
+      - name: "worker-node-2"
+        ip: "10.10.10.12"
+        role: "worker"
+        services:
+          - "ray-worker"
+          - "face-detection"
+          - "embedding"
+    
+  storage:
+    id: 20
+    name: "Storage"
+    subnet: "10.20.20.0/24"
+    gateway: "10.20.20.1"
+    dns: ["10.20.20.1", "8.8.8.8"]
+    description: "Storage-Netzwerk für minIO, NAS, Daten"
+    nodes:
+      - name: "storage-node"
+        ip: "10.20.20.100"
+        role: "storage"
+        services:
+          - "minio"
+          - "nas"
+          - "backup"
+
+# Netzwerk-Interfaces (macOS)
+interfaces:
+  # Management VLAN Interface
+  management:
+    interface: "en0"  # Oder en1 für Ethernet
+    vlan_id: 30
+    ip: "10.30.30.10"  # Wird durch node-spezifische Konfiguration überschrieben
+    netmask: "255.255.255.0"
+    
+  # Worker VLAN Interface
+  worker:
+    interface: "en1"  # Zweite NIC oder VLAN-Interface
+    vlan_id: 10
+    ip: "10.10.10.11"  # Wird durch node-spezifische Konfiguration überschrieben
+    netmask: "255.255.255.0"
+    
+  # Storage VLAN Interface
+  storage:
+    interface: "en2"  # Dritte NIC oder VLAN-Interface
+    vlan_id: 20
+    ip: "10.20.20.100"  # Wird durch node-spezifische Konfiguration überschrieben
+    netmask: "255.255.255.0"
+
+# Service-Port-Mapping pro VLAN
+service_ports:
+  management:
+    ray_dashboard: 8265
+    ssh: 22
+    monitoring: 9090
+    
+  worker:
+    ray_worker: 10001
+    face_detection: 5001
+    embedding: 5002
+    
+  storage:
+    minio: 9000
+    minio_console: 9001
+    nas: 445  # SMB
+
+# Firewall-Regeln
+firewall:
+  management:
+    allow_incoming:
+      - port: 8265  # Ray Dashboard
+      - port: 22    # SSH
+    allow_outgoing:
+      - all: true
+      
+  worker:
+    allow_incoming:
+      - port: 10001  # Ray Worker
+      - port: 5001   # Face Detection
+      - port: 5002   # Embedding
+    allow_outgoing:
+      - subnet: "10.30.30.0/24"  # Management
+      - subnet: "10.20.20.0/24"   # Storage
+      
+  storage:
+    allow_incoming:
+      - port: 9000   # minIO
+      - port: 9001   # minIO Console
+      - port: 445    # SMB
+    allow_outgoing:
+      - subnet: "10.10.10.0/24"  # Worker
+      - subnet: "10.30.30.0/24"  # Management

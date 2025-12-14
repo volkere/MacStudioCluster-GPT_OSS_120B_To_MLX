@@ -131,6 +131,23 @@ pip install -e .
 cd ..
 ```
 
+## 🌐 VLAN-Konfiguration (Optional)
+
+Für Multi-Mac Cluster mit Netzwerk-Isolierung:
+
+```bash
+# Head Node (Management VLAN)
+sudo ./network/setup_vlan.sh head 10.30.30.10
+
+# Worker Node (Worker + Management VLAN)
+sudo ./network/setup_vlan.sh worker 10.30.30.11 10.10.10.11
+
+# Storage Node (Storage + Management VLAN)
+sudo ./network/setup_vlan.sh storage 10.30.30.100 10.20.20.100
+```
+
+Siehe [VLAN_SETUP.md](VLAN_SETUP.md) für detaillierte Anleitung.
+
 ## 🔧 Cluster Setup
 
 ### Option A: Einzelner Mac (Lokaler Cluster)
@@ -488,9 +505,12 @@ Prüfe `pipeline/config.yaml`:
 
 ## 📚 Weitere Dokumentation
 
+- **[VLAN Setup](VLAN_SETUP.md)** - Multi-VLAN Konfiguration für Management, Worker und Storage
 - **[Pipeline README](pipeline/README.md)** - Detaillierte Pipeline-Dokumentation
 - **[Ray Cluster Setup](RAY_CLUSTER_SETUP.md)** - Ray Cluster Setup-Anleitung
+- **[Installation Guide](INSTALLATION.md)** - Vollständige Installationsanleitung
 - **[Services README](services/README.md)** - Service-Dokumentation
+- **[Network README](network/README.md)** - Netzwerk- und VLAN-Dokumentation
 - **[MLX Model Loading](MLX_MODEL_LOADING.md)** - MLX Model Konvertierung
 - **[Face Tagging Software](face_tag_software.md)** - Software-Architektur
 - **[Face Tagging Hardware](face_tag_hardware.md)** - Hardware-Architektur

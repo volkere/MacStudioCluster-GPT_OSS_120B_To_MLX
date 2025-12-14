@@ -1,40 +1,46 @@
 # Face Tagging Pipeline Configuration
 
 # Service Endpoints
+# Konfiguration für Multi-VLAN Setup
 services:
   face_detection:
-    url: "http://localhost:5001"
+    url: "http://10.10.10.11:5001"  # Worker VLAN
     timeout: 30
     retry_attempts: 3
+    vlan: "worker"
     
   embedding:
-    url: "http://localhost:5002"
+    url: "http://10.10.10.11:5002"  # Worker VLAN
     timeout: 30
     retry_attempts: 3
+    vlan: "worker"
     
   llm:
-    url: "http://localhost:8000"
+    url: "http://10.30.30.10:8000"  # Management VLAN (Head Node)
     timeout: 120
     retry_attempts: 2
     model: "gpt-oss-120b-4bit"
+    vlan: "management"
 
-# minIO Configuration
+# minIO Configuration - Storage VLAN
 minio:
-  endpoint: "localhost:9000"
+  endpoint: "10.20.20.100:9000"  # Storage VLAN
   access_key: "minioadmin"
   secret_key: "minioadmin"
   secure: false
+  vlan: "storage"
   buckets:
     incoming: "incoming"
     processed: "processed"
     crops: "face-crops"
 
-# Neo4j Configuration
+# Neo4j Configuration - Management VLAN
 neo4j:
-  uri: "bolt://localhost:7687"
+  uri: "bolt://10.30.30.10:7687"  # Management VLAN (Head Node)
   user: "neo4j"
   password: "password"
   database: "neo4j"
+  vlan: "management"
 
 # Clustering Configuration
 clustering:

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mac Studio Cluster - Admin Dashboard</title>
+    <link rel="stylesheet" href="/static/css/admin.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍎 Mac Studio Cluster</h1>
+            <p>Admin Dashboard für Installation, Konfiguration und Verwaltung</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="overview">Übersicht</button>
+            <button class="tab" data-tab="installation">Installation</button>
+            <button class="tab" data-tab="services">Services</button>
+            <button class="tab" data-tab="vlan">VLAN Setup</button>
+            <button class="tab" data-tab="config">Konfiguration</button>
+            <button class="tab" data-tab="status">Status</button>
+        </div>
+
+        <!-- Tab: Übersicht -->
+        <div id="tab-overview" class="tab-content active">
+            <div class="dashboard">
+                <div class="card">
+                    <h2>Cluster Status</h2>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <h3>Nodes</h3>
+                            <div class="value" id="cluster-nodes">-</div>
+                        </div>
+                        <div class="status-item">
+                            <h3>CPUs</h3>
+                            <div class="value" id="cluster-cpus">-</div>
+                        </div>
+                        <div class="status-item">
+                            <h3>GPUs</h3>
+                            <div class="value" id="cluster-gpus">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>Services</h2>
+                    <div id="status-face-detection" class="status-item">
+                        <span class="status-indicator offline"></span>
+                        <span class="status-text">Face Detection</span>
+                    </div>
+                    <div id="status-embedding" class="status-item">
+                        <span class="status-indicator offline"></span>
+                        <span class="status-text">Embedding</span>
+                    </div>
+                    <div id="status-llm" class="status-item">
+                        <span class="status-indicator offline"></span>
+                        <span class="status-text">LLM (exo)</span>
+                    </div>
+                    <div id="status-minio" class="status-item">
+                        <span class="status-indicator offline"></span>
+                        <span class="status-text">minIO</span>
+                    </div>
+                    <div id="status-neo4j" class="status-item">
+                        <span class="status-indicator offline"></span>
+                        <span class="status-text">Neo4j</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>System</h2>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <h3>RAM</h3>
+                            <div class="value" id="system-ram">-</div>
+                        </div>
+                        <div class="status-item">
+                            <h3>Disk</h3>
+                            <div class="value" id="system-disk">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Installation -->
+        <div id="tab-installation" class="tab-content">
+            <div class="card">
+                <h2>Installation</h2>
+                <p>Installiert alle benötigten Dependencies und konfiguriert das System.</p>
+                
+                <button id="btn-install" class="btn btn-success">Installation starten</button>
+                
+                <div class="log-output" id="install-log"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Services -->
+        <div id="tab-services" class="tab-content">
+            <div class="card">
+                <h2>Services verwalten</h2>
+                
+                <div class="status-item">
+                    <h3>Face Detection Service</h3>
+                    <span class="status-indicator offline" id="status-face-detection-indicator"></span>
+                    <span id="status-face-detection-text">Offline</span>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-success" data-service-start="face_detection">Start</button>
+                        <button class="btn btn-danger" data-service-stop="face_detection">Stop</button>
+                    </div>
+                </div>
+
+                <div class="status-item" style="margin-top: 15px;">
+                    <h3>Embedding Service</h3>
+                    <span class="status-indicator offline" id="status-embedding-indicator"></span>
+                    <span id="status-embedding-text">Offline</span>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-success" data-service-start="embedding">Start</button>
+                        <button class="btn btn-danger" data-service-stop="embedding">Stop</button>
+                    </div>
+                </div>
+
+                <div class="status-item" style="margin-top: 15px;">
+                    <h3>LLM Service (exo)</h3>
+                    <span class="status-indicator offline" id="status-llm-indicator"></span>
+                    <span id="status-llm-text">Offline</span>
+                    <div style="margin-top: 10px;">
+                        <button class="btn btn-success" data-service-start="llm">Start</button>
+                        <button class="btn btn-danger" data-service-stop="llm">Stop</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="startAllServices()">Alle starten</button>
+                    <button class="btn btn-danger" onclick="stopAllServices()">Alle stoppen</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: VLAN Setup -->
+        <div id="tab-vlan" class="tab-content">
+            <div class="card">
+                <h2>VLAN Konfiguration</h2>
+                <p>Konfiguriert VLANs für Management, Worker und Storage Nodes.</p>
+                
+                <form id="vlan-setup-form">
+                    <div class="form-group">
+                        <label>Node-Typ</label>
+                        <select name="node_type" required>
+                            <option value="head">Head Node (Management)</option>
+                            <option value="worker">Worker Node (Worker + Management)</option>
+                            <option value="storage">Storage Node (Storage + Management)</option>
+                            <option value="all">Alle VLANs (Testing)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Management IP (VLAN 30)</label>
+                        <input type="text" name="management_ip" placeholder="10.30.30.10" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Worker IP (VLAN 10) - Optional</label>
+                        <input type="text" name="worker_ip" placeholder="10.10.10.11">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Storage IP (VLAN 20) - Optional</label>
+                        <input type="text" name="storage_ip" placeholder="10.20.20.100">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">VLAN Setup starten</button>
+                </form>
+                
+                <div class="log-output" id="vlan-log"></div>
+            </div>
+        </div>
+
+        <!-- Tab: Konfiguration -->
+        <div id="tab-config" class="tab-content">
+            <div class="card">
+                <h2>Pipeline Konfiguration</h2>
+                <form id="pipeline-config-form">
+                    <div class="form-group">
+                        <label>Face Detection URL</label>
+                        <input type="text" name="face_detection_url" value="http://10.10.10.11:5001">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Embedding URL</label>
+                        <input type="text" name="embedding_url" value="http://10.10.10.11:5002">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>LLM URL</label>
+                        <input type="text" name="llm_url" value="http://10.30.30.10:8000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>minIO Endpoint</label>
+                        <input type="text" name="minio_endpoint" value="10.20.20.100:9000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Neo4j URI</label>
+                        <input type="text" name="neo4j_uri" value="bolt://10.30.30.10:7687">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Speichern</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tab: Status -->
+        <div id="tab-status" class="tab-content">
+            <div class="card">
+                <h2>Detaillierter Status</h2>
+                <div id="detailed-status">
+                    <p>Lade Status...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/admin.js"></script>
+    <script>
+        // Service Management Functions
+        async function startAllServices() {
+            const services = ['face_detection', 'embedding', 'llm'];
+            for (const service of services) {
+                await startService(service);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+
+        async function stopAllServices() {
+            const services = ['face_detection', 'embedding', 'llm'];
+            for (const service of services) {
+                await stopService(service);
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        }
+
+        // Pipeline Config Form
+        document.getElementById('pipeline-config-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const config = {
+                services: {
+                    face_detection: { url: formData.get('face_detection_url') },
+                    embedding: { url: formData.get('embedding_url') },
+                    llm: { url: formData.get('llm_url') }
+                },
+                minio: { endpoint: formData.get('minio_endpoint') },
+                neo4j: { uri: formData.get('neo4j_uri') }
+            };
+            await saveConfig('pipeline', config);
+        });
+    </script>
+</body>
+</html>

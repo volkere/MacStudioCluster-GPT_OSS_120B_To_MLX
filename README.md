@@ -245,6 +245,26 @@ ping <head-ip>
 nc -zv <head-ip> 10001
 ```
 
+## 🖥️ Admin Dashboard
+
+Web-basiertes Interface für Installation, Konfiguration und Verwaltung:
+
+```bash
+cd admin
+./start_admin.sh
+```
+
+Dann öffne im Browser: **http://localhost:8080**
+
+**Features:**
+- ✅ Installation aller Dependencies
+- ✅ Service-Management (Start/Stop)
+- ✅ VLAN-Setup
+- ✅ Konfiguration
+- ✅ Cluster-Status und Monitoring
+
+Siehe [Admin README](admin/README.md) für Details.
+
 ## 📖 Verwendung
 
 ### CLI (Command Line)
@@ -505,6 +525,7 @@ Prüfe `pipeline/config.yaml`:
 
 ## 📚 Weitere Dokumentation
 
+- **[Admin Dashboard](admin/README.md)** - Web-Interface für Installation und Verwaltung
 - **[VLAN Setup](VLAN_SETUP.md)** - Multi-VLAN Konfiguration für Management, Worker und Storage
 - **[Pipeline README](pipeline/README.md)** - Detaillierte Pipeline-Dokumentation
 - **[Ray Cluster Setup](RAY_CLUSTER_SETUP.md)** - Ray Cluster Setup-Anleitung

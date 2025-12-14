@@ -37,6 +37,9 @@ dependencies = [
     "scikit-learn>=1.3.0",
     "pyyaml>=6.0",
     "ray[default]>=2.8.0",
+    "flask>=2.3.0",
+    "flask-cors>=4.0.0",
+    "psutil>=5.9.0",
 ]
 
 [project.optional-dependencies]

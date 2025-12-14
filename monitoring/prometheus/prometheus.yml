@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'cluster-metrics'
+    static_configs:
+      - targets: ['localhost:9091']
+        labels:
+          instance: 'mac-studio-cluster'
+  
+  - job_name: 'ray-cluster'
+    static_configs:
+      - targets: ['localhost:8265']
+        labels:
+          instance: 'ray-head'
+  
+  - job_name: 'services'
+    static_configs:
+      - targets: 
+          - 'localhost:5001'
+          - 'localhost:5002'
+          - 'localhost:8000'
+        labels:
+          instance: 'face-tagging-services'

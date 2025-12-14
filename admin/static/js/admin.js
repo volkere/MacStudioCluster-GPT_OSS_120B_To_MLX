@@ -53,6 +53,8 @@ function switchTab(tabName) {
         loadNodeType();
     } else if (tabName === 'config') {
         loadConfigFromFile();
+    } else if (tabName === 'monitoring') {
+        loadMonitoringStatus();
     }
 }
 
@@ -594,5 +596,86 @@ async function saveConfigToFile() {
         showAlert('Konfiguration gespeichert!', 'success');
     } catch (error) {
         showAlert(`Fehler: ${error.message}`, 'error');
+    }
+}
+
+// Monitoring Management
+async function loadMonitoringStatus() {
+    try {
+        const response = await fetch(`${API_BASE}/monitoring/status`);
+        const data = await response.json();
+        
+        updateMonitoringStatus('grafana', data.grafana);
+        updateMonitoringStatus('prometheus', data.prometheus);
+        updateMonitoringStatus('collector', data.metrics_collector);
+    } catch (error) {
+        console.error('Fehler beim Laden des Monitoring-Status:', error);
+    }
+}
+
+function updateMonitoringStatus(service, status) {
+    const indicator = document.getElementById(`monitoring-${service}-indicator`);
+    const text = document.getElementById(`monitoring-${service}-text`);
+    
+    if (indicator && text) {
+        if (status) {
+            indicator.className = 'status-indicator online';
+            text.textContent = 'Online';
+        } else {
+            indicator.className = 'status-indicator offline';
+            text.textContent = 'Offline';
+        }
+    }
+}
+
+async function startMonitoringService(service) {
+    try {
+        const response = await fetch(`${API_BASE}/monitoring/${service}/start`, {
+            method: 'POST'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert(`${service} gestartet`, 'success');
+            setTimeout(loadMonitoringStatus, 2000);
+        } else {
+            showAlert(`Fehler: ${data.error}`, 'error');
+        }
+    } catch (error) {
+        showAlert(`Fehler: ${error.message}`, 'error');
+    }
+}
+
+async function stopMonitoringService(service) {
+    try {
+        const response = await fetch(`${API_BASE}/monitoring/${service}/stop`, {
+            method: 'POST'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            showAlert(`${service} gestoppt`, 'success');
+            setTimeout(loadMonitoringStatus, 2000);
+        } else {
+            showAlert(`Fehler: ${data.error}`, 'error');
+        }
+    } catch (error) {
+        showAlert(`Fehler: ${error.message}`, 'error');
+    }
+}
+
+async function startAllMonitoring() {
+    const services = ['prometheus', 'metrics_collector', 'grafana'];
+    for (const service of services) {
+        await startMonitoringService(service);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+}
+
+async function stopAllMonitoring() {
+    const services = ['grafana', 'prometheus', 'metrics_collector'];
+    for (const service of services) {
+        await stopMonitoringService(service);
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 }

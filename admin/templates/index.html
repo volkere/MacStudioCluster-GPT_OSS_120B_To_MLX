@@ -20,6 +20,7 @@
             <button class="tab" data-tab="services">Services</button>
             <button class="tab" data-tab="vlan">VLAN Setup</button>
             <button class="tab" data-tab="config">Konfiguration</button>
+            <button class="tab" data-tab="monitoring">Monitoring</button>
             <button class="tab" data-tab="status">Status</button>
         </div>
 
@@ -272,6 +273,53 @@
                 <div id="config-yaml-view" style="display: none; margin-top: 20px;">
                     <h3>YAML Ansicht</h3>
                     <textarea id="config-yaml-text" style="width: 100%; height: 400px; font-family: monospace;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Monitoring -->
+        <div id="tab-monitoring" class="tab-content">
+            <div class="card">
+                <h2>Monitoring Services</h2>
+                <p>Grafana und Prometheus für Cluster-Monitoring</p>
+                
+                <div class="status-item" style="margin-top: 15px;">
+                    <h3>Grafana</h3>
+                    <span class="status-indicator offline" id="monitoring-grafana-indicator"></span>
+                    <span id="monitoring-grafana-text">Offline</span>
+                    <div style="margin-top: 10px;">
+                        <a href="http://localhost:3000" target="_blank" class="btn btn-primary">Öffnen</a>
+                        <button class="btn btn-success" onclick="startMonitoringService('grafana')">Start</button>
+                        <button class="btn btn-danger" onclick="stopMonitoringService('grafana')">Stop</button>
+                    </div>
+                </div>
+
+                <div class="status-item" style="margin-top: 15px;">
+                    <h3>Prometheus</h3>
+                    <span class="status-indicator offline" id="monitoring-prometheus-indicator"></span>
+                    <span id="monitoring-prometheus-text">Offline</span>
+                    <div style="margin-top: 10px;">
+                        <a href="http://localhost:9090" target="_blank" class="btn btn-primary">Öffnen</a>
+                        <button class="btn btn-success" onclick="startMonitoringService('prometheus')">Start</button>
+                        <button class="btn btn-danger" onclick="stopMonitoringService('prometheus')">Stop</button>
+                    </div>
+                </div>
+
+                <div class="status-item" style="margin-top: 15px;">
+                    <h3>Metrics Collector</h3>
+                    <span class="status-indicator offline" id="monitoring-collector-indicator"></span>
+                    <span id="monitoring-collector-text">Offline</span>
+                    <div style="margin-top: 10px;">
+                        <a href="http://localhost:9091/metrics" target="_blank" class="btn btn-primary">Metriken anzeigen</a>
+                        <button class="btn btn-success" onclick="startMonitoringService('metrics_collector')">Start</button>
+                        <button class="btn btn-danger" onclick="stopMonitoringService('metrics_collector')">Stop</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; border-top: 1px solid #ddd; padding-top: 20px;">
+                    <h3>Monitoring-Steuerung</h3>
+                    <button class="btn btn-success" onclick="startAllMonitoring()">Alle starten</button>
+                    <button class="btn btn-danger" onclick="stopAllMonitoring()">Alle stoppen</button>
                 </div>
             </div>
         </div>

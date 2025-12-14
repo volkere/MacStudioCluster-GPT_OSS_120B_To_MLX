@@ -479,6 +479,108 @@ def stop_all_services():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+MONITORING_DIR = PROJECT_ROOT / "monitoring"
+
+@app.route('/api/monitoring/status')
+def monitoring_status():
+    """Gibt Status der Monitoring-Services zurück"""
+    try:
+        status = {
+            'grafana': False,
+            'prometheus': False,
+            'metrics_collector': False
+        }
+        
+        # Prüfe Grafana
+        try:
+            response = requests.get('http://localhost:3000/api/health', timeout=2)
+            status['grafana'] = response.status_code == 200
+        except:
+            pass
+        
+        # Prüfe Prometheus
+        try:
+            response = requests.get('http://localhost:9090/-/healthy', timeout=2)
+            status['prometheus'] = response.status_code == 200
+        except:
+            pass
+        
+        # Prüfe Metrics Collector
+        try:
+            response = requests.get('http://localhost:9091/health', timeout=2)
+            status['metrics_collector'] = response.status_code == 200
+        except:
+            pass
+        
+        return jsonify(status)
+    except Exception as e:
+        logger.error(f"Fehler beim Laden des Monitoring-Status: {e}")
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/monitoring/<service>/start', methods=['POST'])
+def start_monitoring_service(service):
+    """Startet einen Monitoring-Service"""
+    try:
+        scripts = {
+            'grafana': MONITORING_DIR / 'start_grafana.sh',
+            'prometheus': MONITORING_DIR / 'start_prometheus.sh',
+            'metrics_collector': MONITORING_DIR / 'start_metrics_collector.sh'
+        }
+        
+        if service not in scripts:
+            return jsonify({'success': False, 'error': 'Unbekannter Service'}), 404
+        
+        script = scripts[service]
+        if not script.exists():
+            return jsonify({'success': False, 'error': 'Script nicht gefunden'}), 404
+        
+        subprocess.Popen(['bash', str(script)], cwd=MONITORING_DIR, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Fehler beim Starten von {service}: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/monitoring/<service>/stop', methods=['POST'])
+def stop_monitoring_service(service):
+    """Stoppt einen Monitoring-Service"""
+    try:
+        ports = {
+            'grafana': 3000,
+            'prometheus': 9090,
+            'metrics_collector': 9091
+        }
+        
+        if service not in ports:
+            return jsonify({'success': False, 'error': 'Unbekannter Service'}), 404
+        
+        port = ports[service]
+        pids = []
+        for proc in psutil.process_iter(['pid', 'name']):
+            try:
+                for conn in proc.connections():
+                    if conn.laddr.port == port:
+                        pids.append(proc.pid)
+            except:
+                pass
+        
+        if pids:
+            for pid in pids:
+                try:
+                    proc = psutil.Process(pid)
+                    proc.terminate()
+                except:
+                    pass
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Service nicht gefunden'})
+    except Exception as e:
+        logger.error(f"Fehler beim Stoppen von {service}: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port, debug=True)

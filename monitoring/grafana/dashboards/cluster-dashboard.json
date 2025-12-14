@@ -1,45 +1,61 @@
 {
   "dashboard": {
+    "id": null,
+    "uid": "mac-studio-cluster",
     "title": "Mac Studio Cluster Dashboard",
     "tags": ["cluster", "mac-studio", "ray"],
     "timezone": "browser",
-    "schemaVersion": 16,
-    "version": 1,
+    "schemaVersion": 38,
+    "version": 0,
     "refresh": "10s",
     "panels": [
       {
         "id": 1,
         "title": "CPU Usage",
-        "type": "graph",
+        "type": "timeseries",
         "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
         "targets": [
           {
             "expr": "system_cpu_percent",
             "legendFormat": "CPU %",
-            "refId": "A"
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100},
-          {"format": "short"}
-        ]
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        }
       },
       {
         "id": 2,
         "title": "Memory Usage",
-        "type": "graph",
+        "type": "timeseries",
         "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
         "targets": [
           {
             "expr": "system_memory_percent",
             "legendFormat": "Memory %",
-            "refId": "A"
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100},
-          {"format": "short"}
-        ]
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        }
       },
       {
         "id": 3,
@@ -49,7 +65,11 @@
         "targets": [
           {
             "expr": "ray_nodes_count",
-            "refId": "A"
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           }
         ],
         "options": {
@@ -66,7 +86,11 @@
         "targets": [
           {
             "expr": "ray_cpus_available",
-            "refId": "A"
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           }
         ]
       },
@@ -78,7 +102,11 @@
         "targets": [
           {
             "expr": "ray_gpus_available",
-            "refId": "A"
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           }
         ]
       },
@@ -91,42 +119,72 @@
           {
             "expr": "face_detection_status",
             "format": "table",
-            "refId": "A"
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           },
           {
             "expr": "embedding_status",
             "format": "table",
-            "refId": "B"
+            "refId": "B",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           },
           {
             "expr": "llm_status",
             "format": "table",
-            "refId": "C"
+            "refId": "C",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           },
           {
             "expr": "admin_status",
             "format": "table",
-            "refId": "D"
+            "refId": "D",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           }
         ]
       },
       {
         "id": 7,
         "title": "Disk Usage",
-        "type": "graph",
+        "type": "timeseries",
         "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
         "targets": [
           {
             "expr": "system_disk_percent",
             "legendFormat": "Disk %",
-            "refId": "A"
+            "refId": "A",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "prometheus"
+            }
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100},
-          {"format": "short"}
-        ]
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        }
       }
-    ]
-  }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    }
+  },
+  "overwrite": false,
+  "folderId": null,
+  "folderUid": ""
 }

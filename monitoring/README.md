@@ -46,11 +46,36 @@ Dies installiert:
 
 ## Dashboard
 
-Nach dem Start von Grafana:
+### Automatischer Import
+
+Nach dem Start von Grafana sollte das Dashboard automatisch geladen werden. Falls nicht:
+
+### Manueller Import
 
 1. Öffne http://localhost:3000
 2. Login mit `admin` / `admin`
-3. Das "Mac Studio Cluster Dashboard" sollte automatisch geladen werden
+3. Gehe zu: **Dashboards** → **Import** (oder + → Import)
+4. Klicke auf **Upload JSON file**
+5. Wähle die Datei: `monitoring/grafana/dashboards/cluster-dashboard.json`
+6. Klicke auf **Load** und dann **Import**
+
+### Über API importieren
+
+```bash
+# Erstelle API Key in Grafana (Configuration → API Keys)
+# Dann:
+curl -X POST http://admin:admin@localhost:3000/api/dashboards/db \
+  -H 'Content-Type: application/json' \
+  -d @monitoring/grafana/dashboards/cluster-dashboard.json
+```
+
+### Dashboard-Script
+
+```bash
+./monitoring/import_dashboard.sh
+```
+
+Dies zeigt dir die Import-Optionen an.
 
 ## Metriken
 

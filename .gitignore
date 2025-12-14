@@ -81,3 +81,9 @@ tmp/
 temp/
 *.tmp
 
+# Service runtime files
+services/.service_pids
+services/*.log
+ray_cluster/*.log
+pipeline/*.log
+

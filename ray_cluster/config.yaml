@@ -1,0 +1,54 @@
+# Ray Cluster Configuration für Mac Studio Cluster
+
+# Head Node (Master)
+head_node:
+  host: "localhost"  # IP des Head Nodes
+  port: 10001
+  dashboard_port: 8265
+
+# Worker Nodes
+worker_nodes:
+  - host: "10.10.10.11"  # Mac Studio M3
+    port: 10001
+    resources:
+      CPU: 16
+      GPU: 1  # MLX GPU
+      memory: 128000  # MB
+  - host: "10.10.10.12"  # Mac Studio M4
+    port: 10001
+    resources:
+      CPU: 16
+      GPU: 1  # MLX GPU
+      memory: 128000  # MB
+
+# Ray Configuration
+ray:
+  num_cpus: 16
+  num_gpus: 1  # MLX GPU pro Node
+  object_store_memory: 32000000000  # 32 GB
+  dashboard_host: "0.0.0.0"
+  runtime_env:
+    pip:
+      - mlx>=0.29.0
+      - mlx-lm>=0.28.0
+      - numpy>=1.24.0
+      - pillow>=9.0.0
+      - requests>=2.28.0
+
+# Resource Allocation
+resources:
+  face_detection:
+    num_cpus: 2
+    num_gpus: 0.5  # Teilweise GPU für Face Detection
+  embedding:
+    num_cpus: 2
+    num_gpus: 0.5  # Teilweise GPU für Embeddings
+  clustering:
+    num_cpus: 4
+    num_gpus: 0  # CPU-only
+
+# Network Configuration
+network:
+  redis_password: null  # Optional: Redis Password für Sicherheit
+  node_ip_address: "0.0.0.0"
+  allow_ports: [10001, 8265, 10002]  # Ray Ports

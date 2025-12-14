@@ -1,0 +1,57 @@
+# Face Tagging Pipeline Configuration
+
+# Service Endpoints
+services:
+  face_detection:
+    url: "http://localhost:5001"
+    timeout: 30
+    retry_attempts: 3
+    
+  embedding:
+    url: "http://localhost:5002"
+    timeout: 30
+    retry_attempts: 3
+    
+  llm:
+    url: "http://localhost:8000"
+    timeout: 120
+    retry_attempts: 2
+    model: "gpt-oss-120b-4bit"
+
+# minIO Configuration
+minio:
+  endpoint: "localhost:9000"
+  access_key: "minioadmin"
+  secret_key: "minioadmin"
+  secure: false
+  buckets:
+    incoming: "incoming"
+    processed: "processed"
+    crops: "face-crops"
+
+# Neo4j Configuration
+neo4j:
+  uri: "bolt://localhost:7687"
+  user: "neo4j"
+  password: "password"
+  database: "neo4j"
+
+# Clustering Configuration
+clustering:
+  algorithm: "dbscan"
+  eps: 0.5
+  min_samples: 2
+  metric: "cosine"
+
+# Processing Configuration
+processing:
+  batch_size: 10
+  max_workers: 4
+  image_formats: ["jpg", "jpeg", "png", "tiff", "bmp"]
+  max_image_size_mb: 50
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  file: "pipeline.log"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"

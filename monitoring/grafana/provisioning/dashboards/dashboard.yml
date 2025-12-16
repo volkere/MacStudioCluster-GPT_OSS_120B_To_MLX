@@ -10,3 +10,5 @@ providers:
     allowUiUpdates: true
     options:
       path: /Users/blaubaer/Documents/Aphrodite/MacStudioCluster/monitoring/grafana/dashboards
+
+

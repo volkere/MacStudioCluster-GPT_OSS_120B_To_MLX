@@ -193,3 +193,5 @@ Antworte nur mit dem Cypher-Query, keine Erklärungen."""
         }
         prompt = self._create_prompt("cypher_generation", context)
         return self.generate(prompt, max_tokens=300, temperature=0.5)
+
+

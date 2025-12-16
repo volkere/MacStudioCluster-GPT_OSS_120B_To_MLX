@@ -72,3 +72,5 @@ log_info "  -H 'Content-Type: application/json' \\"
 log_info "  -d @$DASHBOARD_FILE"
 
 rm -f "$TEMP_FILE"
+
+

@@ -289,3 +289,5 @@ class FaceTagPipeline:
         """Schließt alle Verbindungen"""
         self.neo4j.close()
         logger.info("Pipeline geschlossen")
+
+

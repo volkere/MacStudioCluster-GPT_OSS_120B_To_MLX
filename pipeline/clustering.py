@@ -137,3 +137,5 @@ class FaceClustering:
         representative_idx = cluster_indices[np.argmin(distances)]
         
         return representative_idx
+
+

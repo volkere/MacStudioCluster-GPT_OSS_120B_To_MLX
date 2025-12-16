@@ -67,3 +67,5 @@ echo $GRAFANA_PID > "$MONITORING_DIR/.grafana_pid"
 
 log_info "Grafana gestartet (PID: $GRAFANA_PID)"
 log_info "Zum Stoppen: ./stop_grafana.sh"
+
+

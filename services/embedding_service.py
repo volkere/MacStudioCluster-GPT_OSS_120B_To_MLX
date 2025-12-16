@@ -215,3 +215,5 @@ if __name__ == "__main__":
     logger.info("Starte Embedding Service auf Port 5002")
     logger.info(f"MLX verfügbar: {MLX_AVAILABLE}")
     app.run(host="0.0.0.0", port=5002, debug=False)
+
+

@@ -132,3 +132,5 @@ lsof -i :8000
 - Warte ein paar Sekunden nach dem Start
 - Prüfe die Logs auf Fehlermeldungen
 - Stelle sicher, dass Flask installiert ist: `pip install flask`
+
+

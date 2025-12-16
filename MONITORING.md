@@ -275,3 +275,5 @@ Zugriff: http://localhost:8080 → Tab "Monitoring"
 - [Grafana Dokumentation](https://grafana.com/docs/)
 - [Prometheus Dokumentation](https://prometheus.io/docs/)
 - [Monitoring README](monitoring/README.md)
+
+

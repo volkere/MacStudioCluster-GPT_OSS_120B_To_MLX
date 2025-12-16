@@ -45,3 +45,5 @@ ENV NODE_TYPE=management
 ENV PYTHONUNBUFFERED=1
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+

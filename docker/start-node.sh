@@ -108,3 +108,5 @@ docker-compose ps
 log_info ""
 log_info "Logs anzeigen: docker-compose logs -f"
 log_info "Container stoppen: docker-compose down"
+
+

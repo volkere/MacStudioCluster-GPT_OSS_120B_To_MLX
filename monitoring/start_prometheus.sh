@@ -57,3 +57,5 @@ echo $PROMETHEUS_PID > "$MONITORING_DIR/.prometheus_pid"
 
 log_info "Prometheus gestartet (PID: $PROMETHEUS_PID)"
 log_info "Zum Stoppen: ./stop_prometheus.sh"
+
+

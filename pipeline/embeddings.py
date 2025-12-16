@@ -133,3 +133,5 @@ class EmbeddingService:
                     logger.error(f"Batch-Embedding-Generierung nach {self.retry_attempts} Versuchen fehlgeschlagen")
                     # Fallback zu einzelnen Requests
                     return self.get_embeddings_batch(face_crops)
+
+

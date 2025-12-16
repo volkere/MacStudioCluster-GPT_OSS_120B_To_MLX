@@ -124,3 +124,5 @@ firewall:
     allow_outgoing:
       - subnet: "10.10.10.0/24"  # Worker
       - subnet: "10.30.30.0/24"  # Management
+
+

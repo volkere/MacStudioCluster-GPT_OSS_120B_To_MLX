@@ -154,3 +154,5 @@ if __name__ == "__main__":
     logger.info("Starte Face Detection Service auf Port 5001")
     logger.info(f"MLX verfügbar: {MLX_AVAILABLE}")
     app.run(host="0.0.0.0", port=5001, debug=False)
+
+

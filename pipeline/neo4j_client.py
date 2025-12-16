@@ -241,3 +241,5 @@ class Neo4jClient:
         """Schließt die Verbindung zur Neo4j-Datenbank"""
         self.driver.close()
         logger.info("Neo4j-Verbindung geschlossen")
+
+

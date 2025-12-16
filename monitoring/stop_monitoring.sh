@@ -68,3 +68,5 @@ for port in 9090 3000 9091; do
 done
 
 log_info "=== Alle Monitoring Services gestoppt ==="
+
+

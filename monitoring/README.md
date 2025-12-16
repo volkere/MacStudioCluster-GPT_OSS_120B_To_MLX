@@ -136,3 +136,4 @@ Die Admin-Seite kann über die API auf Monitoring-Status zugreifen:
 - Grafana: http://localhost:3000
 - Prometheus: http://localhost:9090
 - Metrics: http://localhost:9091/metrics
+

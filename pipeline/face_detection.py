@@ -161,3 +161,5 @@ class FaceDetectionService:
         except Exception as e:
             logger.error(f"Fehler beim Croppen des Gesichts: {e}")
             raise
+
+

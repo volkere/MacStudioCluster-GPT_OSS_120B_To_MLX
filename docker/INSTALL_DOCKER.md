@@ -98,3 +98,5 @@ Oder für einen Worker Node:
 ```bash
 ./start-node.sh worker <head-ip>:6380
 ```
+
+

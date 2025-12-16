@@ -59,3 +59,5 @@ echo $COLLECTOR_PID > "$MONITORING_DIR/.metrics_collector_pid"
 log_info "Metrics Collector gestartet (PID: $COLLECTOR_PID)"
 log_info "Log: $MONITORING_DIR/metrics_collector.log"
 log_info "Zum Stoppen: ./stop_metrics_collector.sh"
+
+

@@ -120,3 +120,5 @@ class EmbeddingActor:
             embedding = self.encode(crop)
             embeddings.append(embedding)
         return embeddings
+
+

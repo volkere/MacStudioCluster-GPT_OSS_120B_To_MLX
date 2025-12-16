@@ -165,3 +165,5 @@ class FaceDetectionActor:
             faces = self.detect(image_bytes)
             results.append(faces)
         return results
+
+

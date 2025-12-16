@@ -167,3 +167,5 @@ class MinIOClient:
         except S3Error as e:
             logger.error(f"Fehler beim Auflisten von '{bucket_name}': {e}")
             return []
+
+

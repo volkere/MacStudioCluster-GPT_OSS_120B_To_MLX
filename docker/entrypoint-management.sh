@@ -53,3 +53,5 @@ echo "[INFO] Services laufen im Hintergrund"
 
 # Halte Container am Leben
 tail -f /dev/null
+
+

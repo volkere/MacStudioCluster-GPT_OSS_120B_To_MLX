@@ -16,7 +16,8 @@ import base64
 
 # Projekt-Root zum Path hinzufügen
 PROJECT_ROOT = Path(__file__).parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from pipeline.face_tag_pipeline import FaceTagPipeline
 from pipeline.minio_client import MinIOClient

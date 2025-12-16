@@ -37,18 +37,42 @@ fi
 # Aktiviere Environment
 source "$MLX_ENV/bin/activate"
 
+# Prüfe Python-Environment
+PYTHON_PATH=$(which python)
+log_info "Verwende Python: $PYTHON_PATH"
+
 # Installiere Dependencies falls nötig
 log_info "Prüfe Dependencies..."
+MISSING_DEPS=""
+
 if ! python -c "import streamlit" 2>/dev/null; then
-    log_info "Installiere Streamlit und Dependencies..."
-    pip install streamlit pillow requests minio neo4j scikit-learn pyyaml
+    MISSING_DEPS="$MISSING_DEPS streamlit"
+fi
+if ! python -c "import minio" 2>/dev/null; then
+    MISSING_DEPS="$MISSING_DEPS minio"
+fi
+if ! python -c "import neo4j" 2>/dev/null; then
+    MISSING_DEPS="$MISSING_DEPS neo4j"
+fi
+if ! python -c "import yaml" 2>/dev/null; then
+    MISSING_DEPS="$MISSING_DEPS pyyaml"
+fi
+
+if [ -n "$MISSING_DEPS" ]; then
+    log_info "Installiere fehlende Dependencies:$MISSING_DEPS"
+    pip install $MISSING_DEPS pillow requests scikit-learn
 fi
 
 # Installiere Projekt-Dependencies
 log_info "Installiere Projekt-Dependencies..."
-pip install -e . --quiet || {
-    log_warn "Einige Dependencies fehlen, installiere manuell..."
-    pip install minio neo4j scikit-learn pyyaml requests pillow
+pip install -e . --quiet 2>&1 | grep -v "already satisfied" || true
+
+# Finale Prüfung
+log_info "Prüfe alle Dependencies..."
+python -c "import minio, neo4j, streamlit, yaml; print('[OK] Alle Dependencies verfügbar')" || {
+    log_error "Einige Dependencies fehlen!"
+    log_info "Bitte installieren Sie manuell: pip install minio neo4j streamlit pyyaml"
+    exit 1
 }
 
 # Prüfe ob Port belegt ist

@@ -19,9 +19,25 @@ PROJECT_ROOT = Path(__file__).parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from pipeline.face_tag_pipeline import FaceTagPipeline
-from pipeline.minio_client import MinIOClient
-import yaml
+# Prüfe Dependencies
+try:
+    import minio
+    import neo4j
+    import yaml
+except ImportError as e:
+    st.error(f"❌ Fehlende Dependencies: {e}")
+    st.info("Bitte installieren Sie die Dependencies mit: pip install minio neo4j pyyaml")
+    st.stop()
+
+# Lazy Import der Pipeline (nur wenn benötigt)
+try:
+    from pipeline.face_tag_pipeline import FaceTagPipeline
+    from pipeline.minio_client import MinIOClient
+except ImportError as e:
+    st.error(f"❌ Fehler beim Import der Pipeline: {e}")
+    st.info("Bitte stellen Sie sicher, dass alle Dependencies installiert sind:")
+    st.code("pip install -e .")
+    st.stop()
 
 # Page Config
 st.set_page_config(
@@ -78,9 +94,18 @@ st.markdown("""
 def init_pipeline():
     """Initialisiert die Pipeline (cached)"""
     try:
+        # Prüfe ob Dependencies verfügbar sind
+        import minio
+        import neo4j
+        
         config_path = PROJECT_ROOT / "pipeline" / "config.yaml"
+        if not config_path.exists():
+            return None, f"Konfigurationsdatei nicht gefunden: {config_path}"
+        
         pipeline = FaceTagPipeline(str(config_path))
         return pipeline, None
+    except ImportError as e:
+        return None, f"Fehlende Dependencies: {e}. Bitte installieren Sie: pip install minio neo4j"
     except Exception as e:
         return None, str(e)
 

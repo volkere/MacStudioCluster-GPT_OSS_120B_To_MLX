@@ -37,12 +37,19 @@ fi
 # Aktiviere Environment
 source "$MLX_ENV/bin/activate"
 
-# Installiere Streamlit falls nötig
-log_info "Prüfe Streamlit..."
+# Installiere Dependencies falls nötig
+log_info "Prüfe Dependencies..."
 if ! python -c "import streamlit" 2>/dev/null; then
-    log_info "Installiere Streamlit..."
-    pip install streamlit pillow requests
+    log_info "Installiere Streamlit und Dependencies..."
+    pip install streamlit pillow requests minio neo4j scikit-learn pyyaml
 fi
+
+# Installiere Projekt-Dependencies
+log_info "Installiere Projekt-Dependencies..."
+pip install -e . --quiet || {
+    log_warn "Einige Dependencies fehlen, installiere manuell..."
+    pip install minio neo4j scikit-learn pyyaml requests pillow
+}
 
 # Prüfe ob Port belegt ist
 if lsof -Pi :8501 -sTCP:LISTEN -t >/dev/null 2>&1 ; then

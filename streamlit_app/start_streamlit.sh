@@ -84,9 +84,19 @@ if lsof -Pi :8501 -sTCP:LISTEN -t >/dev/null 2>&1 ; then
     sleep 2
 fi
 
-# Starte Streamlit
+# Starte Streamlit mit explizitem Python-Pfad
 log_info "Starte Streamlit App..."
 log_info "App: http://localhost:8501"
+log_info "Python: $PYTHON_PATH"
 
 cd "$PROJECT_ROOT"
-streamlit run "$STREAMLIT_APP" --server.port 8501 --server.address 0.0.0.0
+
+# Verwende explizit Python aus mlx_env
+PYTHON_BIN="$MLX_ENV/bin/python"
+if [ ! -f "$PYTHON_BIN" ]; then
+    log_error "Python nicht gefunden: $PYTHON_BIN"
+    exit 1
+fi
+
+# Starte Streamlit mit explizitem Python
+"$PYTHON_BIN" -m streamlit run "$STREAMLIT_APP" --server.port 8501 --server.address 0.0.0.0

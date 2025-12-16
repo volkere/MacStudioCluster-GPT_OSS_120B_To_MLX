@@ -25,7 +25,7 @@ try:
     import neo4j
     import yaml
 except ImportError as e:
-    st.error(f"❌ Fehlende Dependencies: {e}")
+    st.error(f"Fehlende Dependencies: {e}")
     st.info("Bitte installieren Sie die Dependencies mit: pip install minio neo4j pyyaml")
     st.stop()
 
@@ -34,7 +34,7 @@ try:
     from pipeline.face_tag_pipeline import FaceTagPipeline
     from pipeline.minio_client import MinIOClient
 except ImportError as e:
-    st.error(f"❌ Fehler beim Import der Pipeline: {e}")
+    st.error(f"Fehler beim Import der Pipeline: {e}")
     st.info("Bitte stellen Sie sicher, dass alle Dependencies installiert sind:")
     st.code("pip install -e .")
     st.stop()
@@ -42,7 +42,6 @@ except ImportError as e:
 # Page Config
 st.set_page_config(
     page_title="Face Tagging Pipeline - Admin",
-    page_icon="📸",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -143,15 +142,9 @@ def display_step(step_num: int, title: str, description: str, status: str = "pen
         "pending": ""
     }.get(status, "")
     
-    status_icon = {
-        "completed": "✅",
-        "active": "🔄",
-        "pending": "⏳"
-    }.get(status, "⏳")
-    
     st.markdown(f"""
     <div class="step-box {status_class}">
-        <h3>{status_icon} Schritt {step_num}: {title}</h3>
+        <h3>Schritt {step_num}: {title}</h3>
         <p>{description}</p>
     </div>
     """, unsafe_allow_html=True)
@@ -159,13 +152,13 @@ def display_step(step_num: int, title: str, description: str, status: str = "pen
 
 def main():
     # Header
-    st.markdown('<div class="main-header">📸 Face Tagging Pipeline - Admin</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">Face Tagging Pipeline - Admin</div>', unsafe_allow_html=True)
     
     # Sidebar: Navigation
     st.sidebar.title("Navigation")
     page = st.sidebar.radio(
         "Seite wählen",
-        ["🏠 Übersicht", "📤 Bild hochladen", "🔄 Verarbeitung", "📊 Ergebnisse", "⚙️ Konfiguration"]
+        ["Übersicht", "Bild hochladen", "Verarbeitung", "Ergebnisse", "Konfiguration"]
     )
     
     # Services Status
@@ -182,15 +175,15 @@ def main():
         )
     
     # Hauptinhalt basierend auf ausgewählter Seite
-    if page == "🏠 Übersicht":
+    if page == "Übersicht":
         show_overview()
-    elif page == "📤 Bild hochladen":
+    elif page == "Bild hochladen":
         show_upload()
-    elif page == "🔄 Verarbeitung":
+    elif page == "Verarbeitung":
         show_processing()
-    elif page == "📊 Ergebnisse":
+    elif page == "Ergebnisse":
         show_results()
-    elif page == "⚙️ Konfiguration":
+    elif page == "Konfiguration":
         show_configuration()
 
 
@@ -203,7 +196,7 @@ def show_overview():
     """)
     
     st.markdown("---")
-    st.subheader("📋 Schritt-für-Schritt-Anleitung")
+    st.subheader("Schritt-für-Schritt-Anleitung")
     
     # Schritt 1: Services prüfen
     services_status = check_services_status()
@@ -218,8 +211,8 @@ def show_overview():
     )
     
     if not all_online:
-        st.warning("⚠️ Nicht alle Services sind online. Bitte starten Sie die fehlenden Services.")
-        if st.button("🔄 Services-Status aktualisieren"):
+        st.warning("Nicht alle Services sind online. Bitte starten Sie die fehlenden Services.")
+        if st.button("Services-Status aktualisieren"):
             st.rerun()
     
     # Schritt 2: Bild hochladen
@@ -252,29 +245,29 @@ def show_overview():
     
     # Quick Actions
     st.markdown("---")
-    st.subheader("🚀 Quick Actions")
+    st.subheader("Quick Actions")
     
     col1, col2, col3 = st.columns(3)
     
     with col1:
-        if st.button("📤 Zum Bild-Upload", use_container_width=True):
+        if st.button("Zum Bild-Upload", use_container_width=True):
             st.session_state.page = "upload"
             st.rerun()
     
     with col2:
-        if st.button("🔄 Zur Verarbeitung", use_container_width=True):
+        if st.button("Zur Verarbeitung", use_container_width=True):
             st.session_state.page = "processing"
             st.rerun()
     
     with col3:
-        if st.button("📊 Zu den Ergebnissen", use_container_width=True):
+        if st.button("Zu den Ergebnissen", use_container_width=True):
             st.session_state.page = "results"
             st.rerun()
 
 
 def show_upload():
     """Bild-Upload-Seite"""
-    st.header("📤 Bild hochladen")
+    st.header("Bild hochladen")
     
     st.markdown("""
     Laden Sie hier ein Bild hoch, das verarbeitet werden soll.
@@ -314,25 +307,25 @@ def show_upload():
             st.session_state.uploaded_image_path = str(image_path)
             st.session_state.uploaded_image = image
         
-        st.success(f"✅ Bild gespeichert: {uploaded_file.name}")
+        st.success(f"Bild gespeichert: {uploaded_file.name}")
         
         # Weiter zur Verarbeitung
         st.markdown("---")
-        st.info("💡 **Nächster Schritt:** Gehen Sie zur Seite 'Verarbeitung', um das Bild zu verarbeiten.")
+        st.info("**Nächster Schritt:** Gehen Sie zur Seite 'Verarbeitung', um das Bild zu verarbeiten.")
         
-        if st.button("🔄 Jetzt verarbeiten", type="primary", use_container_width=True):
+        if st.button("Jetzt verarbeiten", type="primary", use_container_width=True):
             st.session_state.page = "processing"
             st.rerun()
 
 
 def show_processing():
     """Verarbeitungs-Seite"""
-    st.header("🔄 Bild-Verarbeitung")
+    st.header("Bild-Verarbeitung")
     
     # Prüfe ob Bild hochgeladen wurde
     if 'uploaded_image_path' not in st.session_state:
-        st.warning("⚠️ Bitte laden Sie zuerst ein Bild hoch (Seite 'Bild hochladen').")
-        if st.button("📤 Zum Bild-Upload"):
+        st.warning("Bitte laden Sie zuerst ein Bild hoch (Seite 'Bild hochladen').")
+        if st.button("Zum Bild-Upload"):
             st.session_state.page = "upload"
             st.rerun()
         return
@@ -356,12 +349,12 @@ def show_processing():
     # Verarbeitung starten
     st.markdown("---")
     
-    if st.button("🚀 Verarbeitung starten", type="primary", use_container_width=True):
+    if st.button("Verarbeitung starten", type="primary", use_container_width=True):
         # Pipeline initialisieren
         pipeline, error = init_pipeline()
         
         if error:
-            st.error(f"❌ Fehler beim Initialisieren der Pipeline: {error}")
+            st.error(f"Fehler beim Initialisieren der Pipeline: {error}")
             return
         
         # Progress Bar
@@ -409,12 +402,12 @@ def show_processing():
             st.session_state.last_result = result
             st.session_state.processing_complete = True
             
-            status_text.text("✅ Verarbeitung abgeschlossen!")
-            st.success("✅ Bild erfolgreich verarbeitet!")
+            status_text.text("Verarbeitung abgeschlossen!")
+            st.success("Bild erfolgreich verarbeitet!")
             
             # Zusammenfassung
             st.markdown("---")
-            st.subheader("📊 Verarbeitungs-Zusammenfassung")
+            st.subheader("Verarbeitungs-Zusammenfassung")
             
             col1, col2, col3 = st.columns(3)
             with col1:
@@ -426,14 +419,14 @@ def show_processing():
             
             # Weiter zu Ergebnissen
             st.markdown("---")
-            st.info("💡 **Nächster Schritt:** Gehen Sie zur Seite 'Ergebnisse', um Details zu sehen.")
+            st.info("**Nächster Schritt:** Gehen Sie zur Seite 'Ergebnisse', um Details zu sehen.")
             
-            if st.button("📊 Ergebnisse anzeigen", type="primary", use_container_width=True):
+            if st.button("Ergebnisse anzeigen", type="primary", use_container_width=True):
                 st.session_state.page = "results"
                 st.rerun()
                 
         except Exception as e:
-            st.error(f"❌ Fehler bei der Verarbeitung: {str(e)}")
+            st.error(f"Fehler bei der Verarbeitung: {str(e)}")
             import traceback
             st.code(traceback.format_exc())
         finally:
@@ -443,11 +436,11 @@ def show_processing():
 
 def show_results():
     """Ergebnis-Anzeige"""
-    st.header("📊 Verarbeitungs-Ergebnisse")
+    st.header("Verarbeitungs-Ergebnisse")
     
     if 'last_result' not in st.session_state:
-        st.warning("⚠️ Keine Ergebnisse verfügbar. Bitte verarbeiten Sie zuerst ein Bild.")
-        if st.button("🔄 Zur Verarbeitung"):
+        st.warning("Keine Ergebnisse verfügbar. Bitte verarbeiten Sie zuerst ein Bild.")
+        if st.button("Zur Verarbeitung"):
             st.session_state.page = "processing"
             st.rerun()
         return
@@ -455,7 +448,7 @@ def show_results():
     result = st.session_state.last_result
     
     # Übersicht
-    st.subheader("📋 Übersicht")
+    st.subheader("Übersicht")
     col1, col2, col3, col4 = st.columns(4)
     with col1:
         st.metric("Photo-ID", result['photo_id'][:8] + "...")
@@ -468,7 +461,7 @@ def show_results():
     
     # Gesichter
     st.markdown("---")
-    st.subheader("👤 Erkannte Gesichter")
+    st.subheader("Erkannte Gesichter")
     
     faces = result.get('faces', [])
     if faces:
@@ -489,7 +482,7 @@ def show_results():
     
     # Cluster
     st.markdown("---")
-    st.subheader("👥 Gesichts-Cluster")
+    st.subheader("Gesichts-Cluster")
     
     clusters = result.get('clusters', [])
     if clusters:
@@ -513,24 +506,24 @@ def show_results():
     errors = result.get('errors', [])
     if errors:
         st.markdown("---")
-        st.subheader("⚠️ Fehler")
+        st.subheader("Fehler")
         for error in errors:
             st.error(error)
     
     # JSON-Export
     st.markdown("---")
-    st.subheader("💾 Export")
+    st.subheader("Export")
     
     json_str = json.dumps(result, indent=2, ensure_ascii=False)
     st.download_button(
-        label="📥 Ergebnis als JSON herunterladen",
+        label="Ergebnis als JSON herunterladen",
         data=json_str,
         file_name=f"result_{result['photo_id']}.json",
         mime="application/json"
     )
     
     # JSON anzeigen
-    with st.expander("🔍 Vollständiges JSON anzeigen"):
+    with st.expander("Vollständiges JSON anzeigen"):
         st.code(json_str, language="json")
 
 
@@ -571,7 +564,7 @@ def show_configuration():
         neo4j_config = config.get('neo4j', {})
         st.text_input("Neo4j URI", value=neo4j_config.get('uri', ''))
         
-        st.info("💡 Um die Konfiguration zu ändern, bearbeiten Sie die Datei: pipeline/config.yaml")
+        st.info("Um die Konfiguration zu ändern, bearbeiten Sie die Datei: pipeline/config.yaml")
     else:
         st.error("Konfigurationsdatei nicht gefunden!")
 

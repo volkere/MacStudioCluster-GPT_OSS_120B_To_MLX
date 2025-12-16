@@ -14,7 +14,9 @@ echo "{\"node_type\": \"${NODE_TYPE:-worker}\"}" > /app/.node_config.json
 # Warte auf Head Node falls gesetzt
 if [ -n "$RAY_HEAD_ADDRESS" ]; then
     echo "[INFO] Warte auf Head Node: $RAY_HEAD_ADDRESS"
-    until nc -z $(echo $RAY_HEAD_ADDRESS | cut -d: -f1) $(echo $RAY_HEAD_ADDRESS | cut -d: -f2) 2>/dev/null; do
+    HEAD_HOST=$(echo $RAY_HEAD_ADDRESS | cut -d: -f1)
+    HEAD_PORT=$(echo $RAY_HEAD_ADDRESS | cut -d: -f2)
+    until python3 -c "import socket; s = socket.socket(); s.settimeout(1); s.connect(('$HEAD_HOST', $HEAD_PORT)); s.close()" 2>/dev/null; do
         echo "[INFO] Warte auf Head Node..."
         sleep 2
     done

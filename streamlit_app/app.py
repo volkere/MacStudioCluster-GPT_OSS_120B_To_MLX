@@ -46,29 +46,25 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CSS für besseres Styling
+# CSS für besseres Styling (ohne Farben)
 st.markdown("""
 <style>
     .main-header {
         font-size: 2.5rem;
         font-weight: bold;
-        color: #1f77b4;
         margin-bottom: 1rem;
     }
     .step-box {
-        border: 2px solid #1f77b4;
+        border: 2px solid;
         border-radius: 10px;
         padding: 1rem;
         margin: 1rem 0;
-        background-color: #f0f2f6;
     }
     .step-completed {
-        border-color: #28a745;
-        background-color: #d4edda;
+        border-style: solid;
     }
     .step-active {
-        border-color: #ffc107;
-        background-color: #fff3cd;
+        border-style: dashed;
     }
     .status-badge {
         display: inline-block;
@@ -78,12 +74,10 @@ st.markdown("""
         font-weight: 600;
     }
     .status-online {
-        background-color: #28a745;
-        color: white;
+        border: 1px solid;
     }
     .status-offline {
-        background-color: #dc3545;
-        color: white;
+        border: 1px solid;
     }
 </style>
 """, unsafe_allow_html=True)
